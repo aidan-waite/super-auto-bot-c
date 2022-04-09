@@ -2,112 +2,67 @@
 #include <stdlib.h>
 #include <time.h>
 #include <math.h>
+#include "main.h"
 
-struct PetBase
-{
-  char *name;
-  char *unicodeCodePoint;
-  int tier;
-  int count;
-  int spawnChanceRound1;
-  int attack;
-  int health;
-};
-typedef struct PetBase PetBase;
+/* Game State */
 
 PetBase basePets[9];
+BoardSlot boardSlots[5];
+ShopPetSlot shopSlots[3];
+
+/* Printing */
 
 void printPetBase(PetBase pet)
 {
-  printf("%s %s tier:%d count:%d attack:%d health:%d\n",
+  printf("%s %s tier:%d debugCount:%d attack:%d health:%d\n",
          pet.unicodeCodePoint,
          pet.name,
          pet.tier,
-         pet.count,
+         pet.debugCount,
          pet.attack,
          pet.health);
 }
 
-void populateBasePets(void)
+void printPetBuilt(PetBuilt pet)
 {
-  printf("Populating Pets\n");
-
-  int i = 0;
-
-  basePets[i].name = "ant";
-  basePets[i].unicodeCodePoint = "🐜";
-  basePets[i].tier = 1;
-  basePets[i].count = 0;
-  basePets[i].spawnChanceRound1 = 11111111;
-  basePets[i].attack = 2;
-  basePets[i++].health = 1;
-
-  basePets[i].name = "beaver";
-  basePets[i].unicodeCodePoint = "🦫";
-  basePets[i].tier = 1;
-  basePets[i].count = 0;
-  basePets[i].spawnChanceRound1 = 11111111;
-  basePets[i].attack = 2;
-  basePets[i++].health = 2;
-
-  basePets[i].name = "cricket";
-  basePets[i].unicodeCodePoint = "🦗";
-  basePets[i].tier = 1;
-  basePets[i].count = 0;
-  basePets[i].spawnChanceRound1 = 11111111;
-  basePets[i].attack = 1;
-  basePets[i++].health = 2;
-
-  basePets[i].name = "duck";
-  basePets[i].unicodeCodePoint = "🦆";
-  basePets[i].tier = 1;
-  basePets[i].count = 0;
-  basePets[i].spawnChanceRound1 = 11111111;
-  basePets[i].attack = 1;
-  basePets[i++].health = 3;
-
-  basePets[i].name = "fish";
-  basePets[i].unicodeCodePoint = "🐟";
-  basePets[i].tier = 1;
-  basePets[i].count = 0;
-  basePets[i].spawnChanceRound1 = 11111111;
-  basePets[i].attack = 2;
-  basePets[i++].health = 3;
-
-  basePets[i].name = "horse";
-  basePets[i].unicodeCodePoint = "🐎";
-  basePets[i].tier = 1;
-  basePets[i].count = 0;
-  basePets[i].spawnChanceRound1 = 11111111;
-  basePets[i].attack = 2;
-  basePets[i++].health = 1;
-
-  basePets[i].name = "mosquito";
-  basePets[i].unicodeCodePoint = "🦟";
-  basePets[i].tier = 1;
-  basePets[i].count = 0;
-  basePets[i].spawnChanceRound1 = 11111111;
-  basePets[i].attack = 2;
-  basePets[i++].health = 2;
-
-  basePets[i].name = "otter";
-  basePets[i].unicodeCodePoint = "🦦";
-  basePets[i].tier = 1;
-  basePets[i].count = 0;
-  basePets[i].spawnChanceRound1 = 11111111;
-  basePets[i].attack = 1;
-  basePets[i++].health = 2;
-
-  basePets[i].name = "pig";
-  basePets[i].unicodeCodePoint = "🐖";
-  basePets[i].tier = 1;
-  basePets[i].count = 0;
-  basePets[i].spawnChanceRound1 = 11111111;
-  basePets[i].attack = 3;
-  basePets[i++].health = 1;
+  printf("%s %s tier:%d debugCount:%d attack:%d health:%d\n",
+         pet.base.unicodeCodePoint,
+         pet.base.name,
+         pet.base.tier,
+         pet.base.debugCount,
+         pet.attack,
+         pet.health);
 }
 
-int randomPetForTier(int tier)
+void printBasePets(void)
+{
+  for (int x = 0; x < 9; x++)
+  {
+    printPetBase(basePets[x]);
+  }
+}
+
+void printBoardSlots(void)
+{
+  for (int x = 0; x < 5; x++)
+  {
+    printf("Board slot #%d ", x);
+    printPetBuilt(boardSlots[x].pet);
+  }
+}
+
+void printShopSlots(void)
+{
+  for (int x = 0; x < 5; x++)
+  {
+    printf("Shop slot #%d ", x);
+    printPetBase(basePets[x]);
+  }
+}
+
+/* Randoming */
+
+int randomPetBaseIndForTier(int tier)
 {
   // TODO: switch on tier
 
@@ -139,32 +94,145 @@ int randomPetForTier(int tier)
   return 8;
 }
 
-void printBasePets(void)
+PetBase randomPetBase(int tier)
 {
-  for (int x = 0; x < 9; x++)
-  {
-    printPetBase(basePets[x]);
-  }
+  int ind = randomPetBaseIndForTier(tier);
+  PetBase b = {
+      basePets[ind].name,
+      basePets[ind].unicodeCodePoint,
+      basePets[ind].tier,
+      basePets[ind].debugCount,
+      basePets[ind].spawnChanceRound1,
+      basePets[ind].attack,
+      basePets[ind].health};
+  return b;
 }
 
-void testRandomPets()
+/* Testing */
+
+void testRandomPets(void)
 {
   for (int a = 0; a < 25000; a++)
   {
-    basePets[randomPetForTier(1)].count += 1;
+    basePets[randomPetBaseIndForTier(1)].debugCount += 1;
   }
 
   printBasePets();
+}
+
+void testBoardSlots(void)
+{
+  for (int x = 0; x < 5; x++)
+  {
+    PetBase base = randomPetBase(1);
+    int bonusAttack = rand() % 5;
+    int bonusHealth = rand() % 5;
+    PetBuilt built = {base.attack + bonusAttack, base.health + bonusHealth, base};
+    boardSlots[x].position = x;
+    boardSlots[x].pet = built;
+  }
+
+  printBoardSlots();
+}
+
+void testShopSlots(void)
+{
+  for (int x = 0; x < 3; x++)
+  {
+    PetBase p = randomPetBase(1);
+    ShopPetSlot s = {x, p};
+    shopSlots[x] = s;
+  }
+
+  printShopSlots();
+}
+
+void populateBasePets(void)
+{
+  printf("Populating Pets\n");
+
+  int i = 0;
+
+  basePets[i].name = "ant";
+  basePets[i].unicodeCodePoint = "🐜";
+  basePets[i].tier = 1;
+  basePets[i].debugCount = 0;
+  basePets[i].spawnChanceRound1 = 11111111;
+  basePets[i].attack = 2;
+  basePets[i++].health = 1;
+
+  basePets[i].name = "beaver";
+  basePets[i].unicodeCodePoint = "🦫";
+  basePets[i].tier = 1;
+  basePets[i].debugCount = 0;
+  basePets[i].spawnChanceRound1 = 11111111;
+  basePets[i].attack = 2;
+  basePets[i++].health = 2;
+
+  basePets[i].name = "cricket";
+  basePets[i].unicodeCodePoint = "🦗";
+  basePets[i].tier = 1;
+  basePets[i].debugCount = 0;
+  basePets[i].spawnChanceRound1 = 11111111;
+  basePets[i].attack = 1;
+  basePets[i++].health = 2;
+
+  basePets[i].name = "duck";
+  basePets[i].unicodeCodePoint = "🦆";
+  basePets[i].tier = 1;
+  basePets[i].debugCount = 0;
+  basePets[i].spawnChanceRound1 = 11111111;
+  basePets[i].attack = 1;
+  basePets[i++].health = 3;
+
+  basePets[i].name = "fish";
+  basePets[i].unicodeCodePoint = "🐟";
+  basePets[i].tier = 1;
+  basePets[i].debugCount = 0;
+  basePets[i].spawnChanceRound1 = 11111111;
+  basePets[i].attack = 2;
+  basePets[i++].health = 3;
+
+  basePets[i].name = "horse";
+  basePets[i].unicodeCodePoint = "🐎";
+  basePets[i].tier = 1;
+  basePets[i].debugCount = 0;
+  basePets[i].spawnChanceRound1 = 11111111;
+  basePets[i].attack = 2;
+  basePets[i++].health = 1;
+
+  basePets[i].name = "mosquito";
+  basePets[i].unicodeCodePoint = "🦟";
+  basePets[i].tier = 1;
+  basePets[i].debugCount = 0;
+  basePets[i].spawnChanceRound1 = 11111111;
+  basePets[i].attack = 2;
+  basePets[i++].health = 2;
+
+  basePets[i].name = "otter";
+  basePets[i].unicodeCodePoint = "🦦";
+  basePets[i].tier = 1;
+  basePets[i].debugCount = 0;
+  basePets[i].spawnChanceRound1 = 11111111;
+  basePets[i].attack = 1;
+  basePets[i++].health = 2;
+
+  basePets[i].name = "pig";
+  basePets[i].unicodeCodePoint = "🐖";
+  basePets[i].tier = 1;
+  basePets[i].debugCount = 0;
+  basePets[i].spawnChanceRound1 = 11111111;
+  basePets[i].attack = 3;
+  basePets[i++].health = 1;
 }
 
 int main()
 {
   populateBasePets();
   printBasePets();
-
-  printf("Random Pets\n");
-
   srand(time(0));
+
+  testBoardSlots();
 
   return 0;
 }
