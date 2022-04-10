@@ -13,4 +13,5 @@ gcc main.c && ./a.out
 ## TO DO
 
 - [x] Populate shop pets
-- [ ] Make board slots
+- [x] Make board slots
+- [x] Make shop slots

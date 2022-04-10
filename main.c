@@ -1,3 +1,4 @@
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -9,6 +10,8 @@
 PetBase basePets[9];
 BoardSlot boardSlots[5];
 ShopPetSlot shopSlots[3];
+PlayerState playerState;
+GameState gameState;
 
 /* Printing */
 
@@ -47,17 +50,46 @@ void printBoardSlots(void)
   for (int x = 0; x < 5; x++)
   {
     printf("Board slot #%d ", x);
-    printPetBuilt(boardSlots[x].pet);
+    if (boardSlots[x].isEmpty)
+    {
+      printf("Empty\n");
+    }
+    else
+    {
+      printPetBuilt(boardSlots[x].pet);
+    }
   }
 }
 
 void printShopSlots(void)
 {
-  for (int x = 0; x < 5; x++)
+  for (int x = 0; x < 3; x++)
   {
     printf("Shop slot #%d ", x);
-    printPetBase(basePets[x]);
+    if (shopSlots[x].isEmpty)
+    {
+      printf("Empty\n");
+    }
+    else
+    {
+      printPetBase(shopSlots[x].pet);
+    }
   }
+}
+
+void printGameState(void)
+{
+  char *phaseName = gameState.currentPhase == Shop ? "Shop" : "Battle";
+
+  printf("\n*** GAME STATE ***\nCurrent tier:%d\nSlot count:%d\nPhase:%s\nPlayer health:%d gold:%d\n",
+         gameState.tier,
+         gameState.shopSlotCount,
+         phaseName,
+         playerState.health,
+         playerState.gold);
+  printBoardSlots();
+  printShopSlots();
+  printf("*** / / / ***\n\n");
 }
 
 /* Randoming */
@@ -135,15 +167,19 @@ void testBoardSlots(void)
   printBoardSlots();
 }
 
-void testShopSlots(void)
+void fillShop(void)
 {
-  for (int x = 0; x < 3; x++)
+  for (int x = 0; x < gameState.shopSlotCount; x++)
   {
     PetBase p = randomPetBase(1);
-    ShopPetSlot s = {x, p};
+    ShopPetSlot s = {x, p, false};
     shopSlots[x] = s;
   }
+}
 
+void testShopSlots(void)
+{
+  fillShop();
   printShopSlots();
 }
 
@@ -226,13 +262,83 @@ void populateBasePets(void)
   basePets[i++].health = 1;
 }
 
+void setupBoardSlots(void)
+{
+  for (int x = 0; x < 5; x++)
+  {
+    boardSlots[x].isEmpty = true;
+    boardSlots[x].position = 0;
+  }
+}
+
+void setup(void)
+{
+  srand(time(0));
+  rand();
+  populateBasePets();
+  setupBoardSlots();
+  playerState.health = 10;
+  playerState.gold = 10;
+  gameState.tier = 1;
+  gameState.shopSlotCount = 3;
+  gameState.currentPhase = Shop;
+}
+
+void nextStep(void)
+{
+  printf("Next Step\n");
+  switch (gameState.currentPhase)
+  {
+  case Shop:
+    fillShop();
+    playerState.gold = 10;
+    break;
+  case Battle:
+    printf("prepare battle");
+    break;
+  }
+}
+
+void buyPet(int buySlot, int buildSlot)
+{
+  if (playerState.gold < 3)
+  {
+    printf("Not enough gold to buy pet\n");
+    return;
+  }
+
+  if (shopSlots[buySlot].isEmpty)
+  {
+    printf("Shop slot %d is empty\n", buySlot);
+    return;
+  }
+
+  if (!boardSlots[buildSlot].isEmpty)
+  {
+    printf("Build slot %d is not empty\n", buySlot);
+    return;
+  }
+
+  printf("ACTION - Buy pet: ");
+  printPetBase(shopSlots[buySlot].pet);
+
+  boardSlots[buildSlot].pet.base = shopSlots[buySlot].pet;
+  boardSlots[buildSlot].pet.attack = shopSlots[buySlot].pet.attack;
+  boardSlots[buildSlot].pet.health = shopSlots[buySlot].pet.health;
+  boardSlots[buildSlot].isEmpty = false;
+  boardSlots[buildSlot].position = buildSlot;
+
+  shopSlots[buySlot].isEmpty = true;
+  playerState.gold -= 3;
+}
+
 int main()
 {
-  populateBasePets();
-  printBasePets();
-  srand(time(0));
-
-  testBoardSlots();
+  setup();
+  nextStep();
+  printGameState();
+  buyPet(0, 0);
+  printGameState();
 
   return 0;
 }

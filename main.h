@@ -1,3 +1,4 @@
+#include <stdbool.h>
 
 /* Structs */
 
@@ -25,6 +26,7 @@ struct BoardSlot
 {
   int position;
   PetBuilt pet;
+  bool isEmpty;
 };
 typedef struct BoardSlot BoardSlot;
 
@@ -32,8 +34,31 @@ struct ShopPetSlot
 {
   int position;
   struct PetBase pet;
+  bool isEmpty;
 };
 typedef struct ShopPetSlot ShopPetSlot;
+
+struct PlayerState
+{
+  int health;
+  int gold;
+};
+typedef struct PlayerState PlayerState;
+
+enum phase
+{
+  Shop,
+  Battle
+};
+typedef enum phase phase;
+
+struct GameState
+{
+  int tier;
+  int shopSlotCount;
+  phase currentPhase;
+};
+typedef struct GameState GameState;
 
 void printPetBase(PetBase pet);
 void printPetBuilt(PetBuilt pet);
