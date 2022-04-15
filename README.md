@@ -3,7 +3,7 @@
 ## How to run
 
 ```
-gcc main.c && ./a.out
+gcc main.c engine.c -Wall && ./a.out
 ```
 
 ## References

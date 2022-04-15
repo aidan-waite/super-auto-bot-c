@@ -1,6 +1,14 @@
 #include <stdbool.h>
 
-/* Structs */
+#ifndef MODELS
+#define MODELS
+
+struct TestResult
+{
+  char *errorMessage;
+  bool didSucceed;
+};
+typedef struct TestResult TestResult;
 
 struct PetBase
 {
@@ -35,6 +43,7 @@ struct ShopPetSlot
   int position;
   struct PetBase pet;
   bool isEmpty;
+  // bool isEnabled;
 };
 typedef struct ShopPetSlot ShopPetSlot;
 
@@ -42,6 +51,8 @@ struct PlayerState
 {
   int health;
   int gold;
+  BoardSlot boardSlots[5];
+  ShopPetSlot shopSlots[5];
 };
 typedef struct PlayerState PlayerState;
 
@@ -57,18 +68,8 @@ struct GameState
   int tier;
   int shopSlotCount;
   phase currentPhase;
+  PetBase basePets[20];
 };
 typedef struct GameState GameState;
 
-void printPetBase(PetBase pet);
-void printPetBuilt(PetBuilt pet);
-void printBasePets(void);
-void printShopSlots(void);
-void printBoardSlots(void);
-
-void populateBasePets(void);
-int randomPetBaseIndForTier(int tier);
-PetBase randomPetBase(int tier);
-void testRandomPets(void);
-void testBoardSlots(void);
-void testShopSlots(void);
+#endif
