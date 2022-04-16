@@ -60,3 +60,48 @@ TestResult testFillShop(void)
   result.didSucceed = true;
   return result;
 }
+
+TestResult testBuyPet(void)
+{
+  PlayerState playerState;
+  GameState gameState;
+
+  setup(&gameState, &playerState, 10, 10, 1, Shop);
+
+  TestResult testResult = {"", false};
+
+  if (!playerState.boardSlots[0].isEmpty)
+  {
+    printf("a\n");
+    strcpy(testResult.errorMessage, "Board slots should be empty after setup");
+    return testResult;
+  }
+
+  fillShop(gameState, &playerState);
+
+  if (playerState.shopSlots[0].isEmpty)
+  {
+    printf("b\n");
+    strcpy(testResult.errorMessage, "Shop slots should not be empty after fill shop");
+    return testResult;
+  }
+
+  buyPet(gameState, &playerState, 0, 0);
+
+  if (!playerState.shopSlots[0].isEmpty)
+  {
+    printf("c\n");
+    strcpy(testResult.errorMessage, "Expected shop slot to be empty after buy pet");
+    return testResult;
+  }
+
+  if (playerState.boardSlots[0].isEmpty)
+  {
+    printf("d\n");
+    strcpy(testResult.errorMessage, "Expected board slot to not be empty after buy pet");
+    return testResult;
+  }
+
+  testResult.didSucceed = true;
+  return testResult;
+}

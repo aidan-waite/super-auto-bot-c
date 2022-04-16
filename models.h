@@ -5,7 +5,7 @@
 
 struct TestResult
 {
-  char errorMessage[100];
+  char errorMessage[200];
   bool didSucceed;
 };
 typedef struct TestResult TestResult;
@@ -72,4 +72,4 @@ struct GameState
 };
 typedef struct GameState GameState;
 
-#endif
+#endif // MODELS

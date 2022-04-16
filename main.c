@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "engine.h"
-#include "tests.c"
+#include "tests.h"
 #include "models.h"
 
 void printTestResult(TestResult result, char *name)
@@ -22,6 +22,7 @@ void runAllTests(void)
   printf("--- START TESTS ---\n\n");
   printTestResult(testSetup(), "Setup test");
   printTestResult(testFillShop(), "Fill shop");
+  printTestResult(testBuyPet(), "Buy pet");
   printf("\n--- END TESTS ---\n");
 }
 

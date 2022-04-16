@@ -270,9 +270,6 @@ void buyPet(GameState gameState, PlayerState *playerState, int buySlot, int buil
     return;
   }
 
-  printf("ACTION - Buy pet: ");
-  printPetBase(playerState->shopSlots[buySlot].pet);
-
   playerState->boardSlots[buildSlot].pet.base = playerState->shopSlots[buySlot].pet;
   playerState->boardSlots[buildSlot].pet.attack = playerState->shopSlots[buySlot].pet.attack;
   playerState->boardSlots[buildSlot].pet.health = playerState->shopSlots[buySlot].pet.health;
