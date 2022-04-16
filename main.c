@@ -2,22 +2,31 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "engine.h"
+#include "tests.c"
+#include "models.h"
+
+void printTestResult(TestResult result, char *name)
+{
+  if (result.didSucceed)
+  {
+    printf("✅ %s succeeded\n", name);
+  }
+  else
+  {
+    printf("❌ %s failed: %s\n", name, result.errorMessage);
+  }
+}
+
+void runAllTests(void)
+{
+  printf("--- START TESTS ---\n\n");
+  printTestResult(testSetup(), "Setup test");
+  printTestResult(testFillShop(), "Fill shop");
+  printf("\n--- END TESTS ---\n");
+}
 
 int main()
 {
-  PetBase basePets[9];
-  BoardSlot boardSlots[5];
-  ShopPetSlot shopSlots[5];
-  PlayerState playerState;
-  GameState gameState;
-
-  setup(&gameState, &playerState, 10, 10, 1, Shop);
-
-  printGameState(gameState, playerState);
-
-  fillShop(gameState, &playerState);
-
-  printGameState(gameState, playerState);
-
+  runAllTests();
   return 0;
 }

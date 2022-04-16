@@ -128,8 +128,6 @@ void fillShop(GameState gameState, PlayerState *playerState)
 
 void populateBasePets(PetBase basePets[9])
 {
-  printf("Populating Pets\n");
-
   int i = 0;
 
   basePets[i].name = "ant";

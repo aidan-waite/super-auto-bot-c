@@ -5,7 +5,7 @@
 
 struct TestResult
 {
-  char *errorMessage;
+  char errorMessage[100];
   bool didSucceed;
 };
 typedef struct TestResult TestResult;
