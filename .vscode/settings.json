@@ -3,6 +3,9 @@
     "wchar.h": "c",
     "typeinfo": "c",
     "stdbool.h": "c",
-    "stdio.h": "c"
+    "stdio.h": "c",
+    "iterator": "c",
+    "memory": "c",
+    "random": "c"
   }
 }

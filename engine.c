@@ -4,8 +4,7 @@
 #include <time.h>
 #include <math.h>
 #include "models.h"
-
-/* Printing */
+#include <string.h>
 
 void printPetBuilt(PetBuilt pet)
 {
@@ -68,8 +67,6 @@ void printGameState(GameState gameState, PlayerState playerState)
 
   printf("*** / / / ***\n\n");
 }
-
-/* Randoming */
 
 int randomPetBaseIndForTier(GameState gameState, int tier)
 {
@@ -223,6 +220,9 @@ void clearShopSlots(GameState gameState, PlayerState *playerState)
 
 void setup(GameState *gameState, PlayerState *playerState, int health, int gold, int tier, phase p)
 {
+  memset(playerState, 0, sizeof(PlayerState));
+  memset(gameState, 0, sizeof(GameState));
+
   srand(time(0));
   rand();
   populateBasePets(gameState->basePets);
@@ -278,4 +278,18 @@ void buyPet(GameState gameState, PlayerState *playerState, int buySlot, int buil
 
   playerState->shopSlots[buySlot].isEmpty = true;
   playerState->gold -= 3;
+}
+
+void sellPet(GameState gameState, PlayerState *playerState, int sellSlot)
+{
+  if (playerState->boardSlots[sellSlot].isEmpty)
+  {
+    printf("Board slot is already empty\n");
+    return;
+  }
+
+  playerState->boardSlots[sellSlot].isEmpty = true;
+
+  // TODO: I think you're supposed to get 1 gold per level
+  playerState->gold += 1;
 }

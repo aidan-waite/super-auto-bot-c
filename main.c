@@ -23,6 +23,9 @@ void runAllTests(void)
   printTestResult(testSetup(), "Setup test");
   printTestResult(testFillShop(), "Fill shop");
   printTestResult(testBuyPet(), "Buy pet");
+  printTestResult(testClearShopSlots(), "Clear shop");
+  printTestResult(testClearBoardSlots(), "Clear board");
+  printTestResult(testSellPet(), "Sell pet");
   printf("\n--- END TESTS ---\n");
 }
 

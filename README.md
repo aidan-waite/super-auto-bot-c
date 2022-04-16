@@ -2,9 +2,10 @@
 
 ## How to run
 
-```
-gcc main.c engine.c tests.c && ./a.out
-```
+In terminal:
+
+1. make
+2. ./out.o
 
 ## Roadmap
 

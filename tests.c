@@ -16,22 +16,28 @@ TestResult testSetup(void)
   if (playerState.health != 10)
   {
     snprintf(result.errorMessage, 100, "Health is incorrect. Expected 10 but got %d\n", playerState.health);
-    result.didSucceed = false;
     return result;
   }
 
   if (playerState.gold != 10)
   {
     snprintf(result.errorMessage, 100, "Gold is incorrect. Expected 10 but got %d\n", playerState.gold);
-    result.didSucceed = false;
     return result;
   }
 
   if (gameState.currentPhase != Shop)
   {
     strcpy(result.errorMessage, "Phase is incorrect. Expected shop\n");
-    result.didSucceed = false;
     return result;
+  }
+
+  for (int x = 0; x < 9; x++)
+  {
+    if (gameState.basePets[x].health == 0)
+    {
+      strcpy(result.errorMessage, "Base pet is not setup\n");
+      return result;
+    }
   }
 
   result.didSucceed = true;
@@ -99,6 +105,86 @@ TestResult testBuyPet(void)
   {
     printf("d\n");
     strcpy(testResult.errorMessage, "Expected board slot to not be empty after buy pet");
+    return testResult;
+  }
+
+  testResult.didSucceed = true;
+  return testResult;
+}
+
+TestResult testClearShopSlots(void)
+{
+  GameState gameState;
+  PlayerState playerState;
+
+  setup(&gameState, &playerState, 10, 10, 1, Shop);
+
+  TestResult testResult = {"", false};
+
+  fillShop(gameState, &playerState);
+  clearShopSlots(gameState, &playerState);
+
+  for (int x = 0; x < 5; x++)
+  {
+    if (!playerState.shopSlots[x].isEmpty)
+    {
+      strcpy(testResult.errorMessage, "Shop slot should be empty");
+      return testResult;
+    }
+  }
+
+  testResult.didSucceed = true;
+  return testResult;
+}
+
+TestResult testClearBoardSlots(void)
+{
+  GameState gameState;
+  PlayerState playerState;
+
+  setup(&gameState, &playerState, 10, 10, 1, Shop);
+
+  TestResult testResult = {"", false};
+
+  fillShop(gameState, &playerState);
+  clearShopSlots(gameState, &playerState);
+
+  for (int x = 0; x < 5; x++)
+  {
+    if (!playerState.boardSlots[x].isEmpty)
+    {
+      strcpy(testResult.errorMessage, "Board slot should be empty");
+      return testResult;
+    }
+  }
+
+  testResult.didSucceed = true;
+  return testResult;
+}
+
+TestResult testSellPet(void)
+{
+  GameState gameState;
+  PlayerState playerState;
+
+  setup(&gameState, &playerState, 10, 10, 1, Shop);
+
+  TestResult testResult = {"", false};
+
+  fillShop(gameState, &playerState);
+  buyPet(gameState, &playerState, 2, 2);
+  sellPet(gameState, &playerState, 2);
+
+  if (playerState.gold != 8)
+  {
+    printf("gold is:%d\n", playerState.gold);
+    strcpy(testResult.errorMessage, "Expected gold to be 8");
+    return testResult;
+  }
+
+  if (!playerState.boardSlots[2].isEmpty)
+  {
+    strcpy(testResult.errorMessage, "Expected sold slot to be empty");
     return testResult;
   }
 

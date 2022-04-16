@@ -43,7 +43,6 @@ struct ShopPetSlot
   int position;
   struct PetBase pet;
   bool isEmpty;
-  // bool isEnabled;
 };
 typedef struct ShopPetSlot ShopPetSlot;
 
