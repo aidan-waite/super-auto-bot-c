@@ -10,6 +10,15 @@ struct TestResult
 };
 typedef struct TestResult TestResult;
 
+struct ItemBase
+{
+  char *name;
+  char *unicodeCodePoint;
+  char *effect;
+  int spawnChanceRound1;
+};
+typedef struct ItemBase ItemBase;
+
 struct PetBase
 {
   char *name;
@@ -38,6 +47,14 @@ struct BoardSlot
 };
 typedef struct BoardSlot BoardSlot;
 
+struct ShopItemSlot
+{
+  int position;
+  struct ItemBase item;
+  bool isEmpty;
+};
+typedef struct ShopItemSlot ShopItemSlot;
+
 struct ShopPetSlot
 {
   int position;
@@ -52,6 +69,7 @@ struct PlayerState
   int gold;
   BoardSlot boardSlots[5];
   ShopPetSlot shopSlots[5];
+  ShopItemSlot itemSlots[2];
 };
 typedef struct PlayerState PlayerState;
 
@@ -65,9 +83,11 @@ typedef enum phase phase;
 struct GameState
 {
   int tier;
-  int shopSlotCount;
+  int shopPetSlotCount;
+  int shopItemSlotCount;
   phase currentPhase;
   PetBase basePets[20];
+  ItemBase baseItems[2];
 };
 typedef struct GameState GameState;
 

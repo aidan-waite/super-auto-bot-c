@@ -54,7 +54,7 @@ TestResult testFillShop(void)
 
   TestResult result = {"", false};
 
-  for (int x = 0; x < gameState.shopSlotCount; x++)
+  for (int x = 0; x < gameState.shopPetSlotCount; x++)
   {
     if (playerState.shopSlots[x].isEmpty)
     {
@@ -62,6 +62,8 @@ TestResult testFillShop(void)
       return result;
     }
   }
+
+  printGameState(gameState, playerState);
 
   result.didSucceed = true;
   return result;

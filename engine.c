@@ -28,13 +28,19 @@ void printPetBase(PetBase base)
          base.health);
 }
 
+void printItemBase(ItemBase base)
+{
+  printf("%s %s\n", base.unicodeCodePoint, base.name);
+}
+
 void printGameState(GameState gameState, PlayerState playerState)
 {
   char *phaseName = gameState.currentPhase == Shop ? "Shop" : "Battle";
 
-  printf("\n*** GAME STATE ***\nCurrent tier:%d\nSlot count:%d\nPhase:%s\nPlayer health:%d gold:%d\n",
+  printf("\n*** GAME STATE ***\nCurrent tier:%d\nPet slot count:%d\nItem slot count:%d\nPhase:%s\nPlayer health:%d gold:%d\n",
          gameState.tier,
-         gameState.shopSlotCount,
+         gameState.shopPetSlotCount,
+         gameState.shopItemSlotCount,
          phaseName,
          playerState.health,
          playerState.gold);
@@ -54,7 +60,7 @@ void printGameState(GameState gameState, PlayerState playerState)
 
   for (int b = 0; b < 5; b++)
   {
-    printf("Shop slot #%d ", b);
+    printf("Pet shop slot #%d ", b);
     if (playerState.shopSlots[b].isEmpty)
     {
       printf("Empty\n");
@@ -65,7 +71,63 @@ void printGameState(GameState gameState, PlayerState playerState)
     }
   }
 
+  for (int i = 0; i < 2; i++)
+  {
+    printf("Item shop slot #%d ", i);
+    if (playerState.itemSlots[i].isEmpty)
+    {
+      printf("Empty\n");
+    }
+    else
+    {
+      printItemBase(playerState.itemSlots[i].item);
+    }
+  }
+
   printf("*** / / / ***\n\n");
+}
+
+int randomItemBaseIndForTier(GameState gameState, int tier)
+{
+  // TODO: switch on tier
+
+  // 1. Sum all probabilities
+  int sum = 0;
+  int x = 0;
+
+  for (x = 0; x < 2; x++)
+  {
+    sum += gameState.baseItems[x].spawnChanceRound1;
+  }
+
+  // 2. Random between 0 and sum
+  int r = rand() % sum;
+  int tmp = 0;
+
+  // 3. Walk through each item, adding chance until you're at > randomnum
+  for (x = 0; x < 2; x++)
+  {
+    tmp += gameState.baseItems[x].spawnChanceRound1;
+    if (tmp > r)
+    {
+      return x;
+    }
+  }
+
+  // default to last index
+  return 1;
+}
+
+ItemBase randomItemBase(GameState gameState)
+{
+  int ind = randomItemBaseIndForTier(gameState, 1);
+  ItemBase i = {
+    gameState.baseItems[ind].name,
+    gameState.baseItems[ind].unicodeCodePoint,
+    gameState.baseItems[ind].effect,
+    gameState.baseItems[ind].spawnChanceRound1,
+  };
+  return i;
 }
 
 int randomPetBaseIndForTier(GameState gameState, int tier)
@@ -115,12 +177,34 @@ PetBase randomPetBase(GameState gameState)
 
 void fillShop(GameState gameState, PlayerState *playerState)
 {
-  for (int x = 0; x < gameState.shopSlotCount; x++)
+  for (int x = 0; x < gameState.shopPetSlotCount; x++)
   {
     PetBase p = randomPetBase(gameState);
     ShopPetSlot s = {x, p, false};
     playerState->shopSlots[x] = s;
   }
+
+  for (int s = 0; s < gameState.shopItemSlotCount; s++)
+  {
+    ItemBase item = randomItemBase(gameState);
+    ShopItemSlot slot = {s, item, false};
+    playerState->itemSlots[s] = slot;
+  }
+}
+
+void populateBaseItems(ItemBase baseItems[2])
+{
+  int i = 0;
+
+  baseItems[i].name = "apple";
+  baseItems[i].unicodeCodePoint = "🍎";
+  baseItems[i].effect = "perma-buff-1-1";
+  baseItems[i++].spawnChanceRound1 = 50000000;
+
+  baseItems[i].name = "honey";
+  baseItems[i].unicodeCodePoint = "🍯";
+  baseItems[i].effect = "status-bee";
+  baseItems[i++].spawnChanceRound1 = 50000000;
 }
 
 void populateBasePets(PetBase basePets[9])
@@ -216,6 +300,12 @@ void clearShopSlots(GameState gameState, PlayerState *playerState)
     playerState->shopSlots[x].isEmpty = true;
     playerState->shopSlots[x].position = x;
   }
+
+  for (int s = 0; s < 2; s++)
+  {
+    playerState->itemSlots[s].isEmpty = true;
+    playerState->itemSlots[s].position = s;
+  }
 }
 
 void setup(GameState *gameState, PlayerState *playerState, int health, int gold, int tier, phase p)
@@ -226,10 +316,12 @@ void setup(GameState *gameState, PlayerState *playerState, int health, int gold,
   srand(time(0));
   rand();
   populateBasePets(gameState->basePets);
+  populateBaseItems(gameState->baseItems);
   playerState->health = health;
   playerState->gold = gold;
   gameState->tier = tier;
-  gameState->shopSlotCount = 3;
+  gameState->shopPetSlotCount = 3;
+  gameState->shopItemSlotCount = 1;
   gameState->currentPhase = p;
   clearBoardSlots(playerState);
   clearShopSlots(*gameState, playerState);
