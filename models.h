@@ -10,6 +10,13 @@ struct TestResult
 };
 typedef struct TestResult TestResult;
 
+struct OperationResult
+{
+  char errorMessage[200];
+  bool didSucceed;
+};
+typedef struct OperationResult OperationResult;
+
 struct ItemBase
 {
   char *name;

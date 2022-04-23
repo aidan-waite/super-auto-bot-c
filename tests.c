@@ -63,6 +63,13 @@ TestResult testFillShop(void)
     }
   }
 
+  for (int y = 0; y < gameState.shopItemSlotCount; y++) {
+    if (playerState.itemSlots[y].isEmpty) {
+      strcpy(result.errorMessage, "Missing shop item");
+      return result;
+    }
+  }
+
   printGameState(gameState, playerState);
 
   result.didSucceed = true;
@@ -77,24 +84,13 @@ TestResult testBuyPet(void)
   setup(&gameState, &playerState, 10, 10, 1, Shop);
 
   TestResult testResult = {"", false};
-
-  if (!playerState.boardSlots[0].isEmpty)
-  {
-    printf("a\n");
-    strcpy(testResult.errorMessage, "Board slots should be empty after setup");
-    return testResult;
-  }
-
   fillShop(gameState, &playerState);
+  OperationResult buyResult = buyPet(gameState, &playerState, 0, 0);
 
-  if (playerState.shopSlots[0].isEmpty)
-  {
-    printf("b\n");
-    strcpy(testResult.errorMessage, "Shop slots should not be empty after fill shop");
+  if (!buyResult.didSucceed) {
+    strcpy(testResult.errorMessage, buyResult.errorMessage);
     return testResult;
   }
-
-  buyPet(gameState, &playerState, 0, 0);
 
   if (!playerState.shopSlots[0].isEmpty)
   {
@@ -107,6 +103,32 @@ TestResult testBuyPet(void)
   {
     printf("d\n");
     strcpy(testResult.errorMessage, "Expected board slot to not be empty after buy pet");
+    return testResult;
+  }
+
+  testResult.didSucceed = true;
+  return testResult;
+}
+
+TestResult testBuyPetInsufficientGold(void)
+{
+  PlayerState playerState;
+  GameState gameState;
+
+  setup(&gameState, &playerState, 10, 2, 1, Shop);
+
+  TestResult testResult = {"", false};
+
+  fillShop(gameState, &playerState);
+  OperationResult buyResult = buyPet(gameState, &playerState, 0, 0);
+
+  if (buyResult.didSucceed) {
+    strcpy(testResult.errorMessage, "Buy pet succeeded with insufficient gold");
+    return testResult;
+  }
+
+  if (playerState.gold != 2) {
+    strcpy(testResult.errorMessage, "Gold balance changed when it shouldn't have");
     return testResult;
   }
 
@@ -130,7 +152,14 @@ TestResult testClearShopSlots(void)
   {
     if (!playerState.shopSlots[x].isEmpty)
     {
-      strcpy(testResult.errorMessage, "Shop slot should be empty");
+      strcpy(testResult.errorMessage, "Shop pet slot should be empty");
+      return testResult;
+    }
+  }
+
+  for (int y = 0; y < 2; y++) {
+    if (!playerState.itemSlots[y].isEmpty) {
+      strcpy(testResult.errorMessage, "Shop item slot should be empty");
       return testResult;
     }
   }
@@ -187,6 +216,66 @@ TestResult testSellPet(void)
   if (!playerState.boardSlots[2].isEmpty)
   {
     strcpy(testResult.errorMessage, "Expected sold slot to be empty");
+    return testResult;
+  }
+
+  testResult.didSucceed = true;
+  return testResult;
+}
+
+TestResult testBuyItem(void)
+{
+  GameState gameState;
+  PlayerState playerState;
+
+  setup(&gameState, &playerState, 10, 10, 1, Shop);
+
+  TestResult testResult = {"", false};
+
+  fillShop(gameState, &playerState);
+  buyPet(gameState, &playerState, 2, 2);
+
+  OperationResult buyResult = buyItem(gameState, &playerState, 0, 2);
+
+  if (!buyResult.didSucceed) {
+    strcpy(testResult.errorMessage, buyResult.errorMessage);
+    return testResult;
+  }
+
+  testResult.didSucceed = true;
+  return testResult;
+}
+
+TestResult testBuyApple(void)
+{
+  GameState gameState;
+  PlayerState playerState;
+
+  setup(&gameState, &playerState, 10, 10, 1, Shop);
+
+  TestResult testResult = {"", false};
+
+  fillShop(gameState, &playerState);
+  fillShopWithItem(gameState, &playerState, 0);
+  buyPet(gameState, &playerState, 2, 2);
+
+  int initialAttack = playerState.boardSlots[2].pet.attack;
+  int initialHealth = playerState.boardSlots[2].pet.health;
+
+  OperationResult buyResult = buyItem(gameState, &playerState, 0, 2);
+
+  if (!buyResult.didSucceed) {
+    strcpy(testResult.errorMessage, buyResult.errorMessage);
+    return testResult;
+  }
+
+  if (playerState.boardSlots[2].pet.attack != (initialAttack + 1)) {
+    strcpy(testResult.errorMessage, "Expected intitial attack to go up by 1");
+    return testResult;
+  }
+
+  if (playerState.boardSlots[2].pet.health != (initialHealth + 1)) {
+    strcpy(testResult.errorMessage, "Expected intitial attack to go up by 1");
     return testResult;
   }
 

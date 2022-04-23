@@ -175,6 +175,15 @@ PetBase randomPetBase(GameState gameState)
   return b;
 }
 
+void fillShopWithItem(GameState gameState, PlayerState *playerState, int baseItemIndex)
+{
+  for (int s = 0; s < gameState.shopItemSlotCount; s++)
+  {
+    ShopItemSlot slot = {s, gameState.baseItems[baseItemIndex], false};
+    playerState->itemSlots[s] = slot;
+  }
+}
+
 void fillShop(GameState gameState, PlayerState *playerState)
 {
   for (int x = 0; x < gameState.shopPetSlotCount; x++)
@@ -342,24 +351,55 @@ void nextStep(GameState gameState, PlayerState playerState)
   }
 }
 
-void buyPet(GameState gameState, PlayerState *playerState, int buySlot, int buildSlot)
+OperationResult buyItem(GameState gameState, PlayerState *playerState, int buySlot, int targetSlot)
 {
+  OperationResult result = {"", false};
+
+  if (playerState->gold < 3) {
+    strcpy(result.errorMessage, "Not enough gold to buy item");
+    return result;
+  }
+
+  if (playerState->itemSlots[buySlot].isEmpty) {
+    strcpy(result.errorMessage, "Item slot is empty");
+    return result;
+  }
+
+  if (playerState->boardSlots[targetSlot].isEmpty) {
+    strcpy(result.errorMessage, "Target build slot is empty");
+    return result;
+  }
+
+  if (strcmp(playerState->itemSlots[buySlot].item.effect, "perma-buff-1-1") == 0) {
+    printf("Apply effect: increase attack and health by one\n");
+    playerState->boardSlots[targetSlot].pet.attack += 1;
+    playerState->boardSlots[targetSlot].pet.health += 1;
+  }
+
+  result.didSucceed = true;
+  return result;
+}
+
+OperationResult buyPet(GameState gameState, PlayerState *playerState, int buySlot, int buildSlot)
+{
+  OperationResult result = {"", false};
+
   if (playerState->gold < 3)
   {
-    printf("Not enough gold to buy pet\n");
-    return;
+    strcpy(result.errorMessage, "Not enough gold to buy pet");
+    return result;
   }
 
   if (playerState->shopSlots[buySlot].isEmpty)
   {
-    printf("Shop slot %d is empty\n", buySlot);
-    return;
+    strcpy(result.errorMessage, "Shop slot is empty");
+    return result;
   }
 
   if (!playerState->boardSlots[buildSlot].isEmpty)
   {
-    printf("Build slot %d is not empty\n", buySlot);
-    return;
+    strcpy(result.errorMessage, "Build slot is not empty");
+    return result;
   }
 
   playerState->boardSlots[buildSlot].pet.base = playerState->shopSlots[buySlot].pet;
@@ -370,6 +410,8 @@ void buyPet(GameState gameState, PlayerState *playerState, int buySlot, int buil
 
   playerState->shopSlots[buySlot].isEmpty = true;
   playerState->gold -= 3;
+  result.didSucceed = true;
+  return result;
 }
 
 void sellPet(GameState gameState, PlayerState *playerState, int sellSlot)

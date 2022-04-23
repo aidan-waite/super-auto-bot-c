@@ -23,9 +23,12 @@ void runAllTests(void)
   printTestResult(testSetup(), "Setup test");
   printTestResult(testFillShop(), "Fill shop");
   printTestResult(testBuyPet(), "Buy pet");
+  printTestResult(testBuyPetInsufficientGold(), "Buy pet insufficient gold");
   printTestResult(testClearShopSlots(), "Clear shop");
   printTestResult(testClearBoardSlots(), "Clear board");
   printTestResult(testSellPet(), "Sell pet");
+  printTestResult(testBuyItem(), "Buy item");
+  printTestResult(testBuyApple(), "Buy apple");
   printf("\n--- END TESTS ---\n");
 }
 
