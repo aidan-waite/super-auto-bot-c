@@ -212,7 +212,7 @@ void populateBaseItems(ItemBase baseItems[2])
 
   baseItems[i].name = "honey";
   baseItems[i].unicodeCodePoint = "🍯";
-  baseItems[i].effect = "status-bee";
+  baseItems[i].effect = "equip-bee";
   baseItems[i++].spawnChanceRound1 = 50000000;
 }
 
@@ -371,9 +371,12 @@ OperationResult buyItem(GameState gameState, PlayerState *playerState, int buySl
   }
 
   if (strcmp(playerState->itemSlots[buySlot].item.effect, "perma-buff-1-1") == 0) {
-    printf("Apply effect: increase attack and health by one\n");
     playerState->boardSlots[targetSlot].pet.attack += 1;
     playerState->boardSlots[targetSlot].pet.health += 1;
+  }
+
+  if (strcmp(playerState->itemSlots[buySlot].item.effect, "equip-bee") == 0) {
+    playerState->boardSlots[targetSlot].pet.equippedItem = "bee";
   }
 
   result.didSucceed = true;

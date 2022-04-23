@@ -43,6 +43,7 @@ struct PetBuilt
   int attack;
   int health;
   PetBase base;
+  char *equippedItem;
 };
 typedef struct PetBuilt PetBuilt;
 

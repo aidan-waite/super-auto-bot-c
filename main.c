@@ -29,6 +29,7 @@ void runAllTests(void)
   printTestResult(testSellPet(), "Sell pet");
   printTestResult(testBuyItem(), "Buy item");
   printTestResult(testBuyApple(), "Buy apple");
+  printTestResult(testBuyHoney(), "Buy honey");
   printf("\n--- END TESTS ---\n");
 }
 

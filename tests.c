@@ -282,3 +282,31 @@ TestResult testBuyApple(void)
   testResult.didSucceed = true;
   return testResult;
 }
+
+TestResult testBuyHoney(void)
+{
+  GameState gameState;
+  PlayerState playerState;
+
+  setup(&gameState, &playerState, 10, 10, 1, Shop);
+
+  TestResult testResult = {"", false};
+
+  fillShop(gameState, &playerState);
+  fillShopWithItem(gameState, &playerState, 1);
+  buyPet(gameState, &playerState, 2, 2);
+  OperationResult buyResult = buyItem(gameState, &playerState, 0, 2);
+
+  if (!buyResult.didSucceed) {
+    strcpy(testResult.errorMessage, buyResult.errorMessage);
+    return testResult;
+  }
+
+  if (strcmp(playerState.boardSlots[2].pet.equippedItem, "bee") != 0) {
+    strcpy(testResult.errorMessage, "Expected status to be bee");
+    return testResult;
+  }
+
+  testResult.didSucceed = true;
+  return testResult;
+}
