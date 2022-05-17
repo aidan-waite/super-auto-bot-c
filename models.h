@@ -1,7 +1,7 @@
-#include <stdbool.h>
-
 #ifndef MODELS
 #define MODELS
+
+#include <stdbool.h>
 
 struct TestResult
 {
@@ -9,6 +9,14 @@ struct TestResult
   bool didSucceed;
 };
 typedef struct TestResult TestResult;
+
+enum BattlePhaseResult
+{
+  BattlePhaseResultPlayer1Win,
+  BattlePhaseResultPlayer2Win,
+  BattlePhaseResultTie
+};
+typedef enum BattlePhaseResult BattlePhaseResult;
 
 struct OperationResult
 {
@@ -38,11 +46,20 @@ struct PetBase
 };
 typedef struct PetBase PetBase;
 
+struct PetBattleState
+{
+  int attack;
+  int health;
+  bool fainted;
+};
+typedef struct PetBattleState PetBattleState;
+
 struct PetBuilt
 {
   int attack;
   int health;
   PetBase base;
+  PetBattleState battleState;
   char *equippedItem;
 };
 typedef struct PetBuilt PetBuilt;
@@ -81,19 +98,19 @@ struct PlayerState
 };
 typedef struct PlayerState PlayerState;
 
-enum phase
+enum Phase
 {
-  Shop,
-  Battle
+  PhaseShop,
+  PhaseBattle
 };
-typedef enum phase phase;
+typedef enum Phase Phase;
 
 struct GameState
 {
   int tier;
   int shopPetSlotCount;
   int shopItemSlotCount;
-  phase currentPhase;
+  Phase currentPhase;
   PetBase basePets[20];
   ItemBase baseItems[2];
 };

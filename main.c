@@ -30,6 +30,11 @@ void runAllTests(void)
   printTestResult(testBuyItem(), "Buy item");
   printTestResult(testBuyApple(), "Buy apple");
   printTestResult(testBuyHoney(), "Buy honey");
+  printTestResult(testSingleBattleRound(), "Battle round");
+  printTestResult(testBattlePhase(), "Battle phase");
+  printTestResult(testAntTrigger(), "Ant trigger");
+  printTestResult(testCricketTrigger(), "Cricket trigger");
+  printTestResult(testBeeTrigger(), "Bee trigger");
   printf("\n--- END TESTS ---\n");
 }
 

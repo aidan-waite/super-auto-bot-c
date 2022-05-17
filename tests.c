@@ -9,7 +9,7 @@ TestResult testSetup(void)
   PlayerState playerState;
   GameState gameState;
 
-  setup(&gameState, &playerState, 10, 10, 1, Shop);
+  setup(&gameState, &playerState, 10, 10, 1, PhaseShop);
 
   TestResult result = {"", false};
 
@@ -25,7 +25,7 @@ TestResult testSetup(void)
     return result;
   }
 
-  if (gameState.currentPhase != Shop)
+  if (gameState.currentPhase != PhaseShop)
   {
     strcpy(result.errorMessage, "Phase is incorrect. Expected shop\n");
     return result;
@@ -49,7 +49,7 @@ TestResult testFillShop(void)
   PlayerState playerState;
   GameState gameState;
 
-  setup(&gameState, &playerState, 10, 10, 1, Shop);
+  setup(&gameState, &playerState, 10, 10, 1, PhaseShop);
   fillShop(gameState, &playerState);
 
   TestResult result = {"", false};
@@ -81,7 +81,7 @@ TestResult testBuyPet(void)
   PlayerState playerState;
   GameState gameState;
 
-  setup(&gameState, &playerState, 10, 10, 1, Shop);
+  setup(&gameState, &playerState, 10, 10, 1, PhaseShop);
 
   TestResult testResult = {"", false};
   fillShop(gameState, &playerState);
@@ -94,14 +94,12 @@ TestResult testBuyPet(void)
 
   if (!playerState.shopSlots[0].isEmpty)
   {
-    printf("c\n");
     strcpy(testResult.errorMessage, "Expected shop slot to be empty after buy pet");
     return testResult;
   }
 
   if (playerState.boardSlots[0].isEmpty)
   {
-    printf("d\n");
     strcpy(testResult.errorMessage, "Expected board slot to not be empty after buy pet");
     return testResult;
   }
@@ -115,7 +113,7 @@ TestResult testBuyPetInsufficientGold(void)
   PlayerState playerState;
   GameState gameState;
 
-  setup(&gameState, &playerState, 10, 2, 1, Shop);
+  setup(&gameState, &playerState, 10, 2, 1, PhaseShop);
 
   TestResult testResult = {"", false};
 
@@ -141,7 +139,7 @@ TestResult testClearShopSlots(void)
   GameState gameState;
   PlayerState playerState;
 
-  setup(&gameState, &playerState, 10, 10, 1, Shop);
+  setup(&gameState, &playerState, 10, 10, 1, PhaseShop);
 
   TestResult testResult = {"", false};
 
@@ -173,7 +171,7 @@ TestResult testClearBoardSlots(void)
   GameState gameState;
   PlayerState playerState;
 
-  setup(&gameState, &playerState, 10, 10, 1, Shop);
+  setup(&gameState, &playerState, 10, 10, 1, PhaseShop);
 
   TestResult testResult = {"", false};
 
@@ -198,7 +196,7 @@ TestResult testSellPet(void)
   GameState gameState;
   PlayerState playerState;
 
-  setup(&gameState, &playerState, 10, 10, 1, Shop);
+  setup(&gameState, &playerState, 10, 10, 1, PhaseShop);
 
   TestResult testResult = {"", false};
 
@@ -228,7 +226,7 @@ TestResult testBuyItem(void)
   GameState gameState;
   PlayerState playerState;
 
-  setup(&gameState, &playerState, 10, 10, 1, Shop);
+  setup(&gameState, &playerState, 10, 10, 1, PhaseShop);
 
   TestResult testResult = {"", false};
 
@@ -251,7 +249,7 @@ TestResult testBuyApple(void)
   GameState gameState;
   PlayerState playerState;
 
-  setup(&gameState, &playerState, 10, 10, 1, Shop);
+  setup(&gameState, &playerState, 10, 10, 1, PhaseShop);
 
   TestResult testResult = {"", false};
 
@@ -288,7 +286,7 @@ TestResult testBuyHoney(void)
   GameState gameState;
   PlayerState playerState;
 
-  setup(&gameState, &playerState, 10, 10, 1, Shop);
+  setup(&gameState, &playerState, 10, 10, 1, PhaseShop);
 
   TestResult testResult = {"", false};
 
@@ -305,6 +303,173 @@ TestResult testBuyHoney(void)
   if (strcmp(playerState.boardSlots[2].pet.equippedItem, "bee") != 0) {
     strcpy(testResult.errorMessage, "Expected status to be bee");
     return testResult;
+  }
+
+  testResult.didSucceed = true;
+  return testResult;
+}
+
+TestResult testSingleBattleRound(void)
+{
+  TestResult testResult = {"", false};
+  PetBase beaver = beaverBase();
+
+  GameState gameState1;
+  PlayerState playerState1;
+  setup(&gameState1, &playerState1, 10, 10, 1, PhaseBattle);
+  setPet(&playerState1, beaver, 0);
+  setupBattleState(&playerState1);
+
+  GameState gameState2;
+  PlayerState playerState2;
+  setup(&gameState2, &playerState2, 10, 10, 1, PhaseBattle);
+  setPet(&playerState2, beaver, 0);
+  setupBattleState(&playerState2);
+
+  OperationResult result = doBattleRound(&playerState1, &playerState2);
+  if (!result.didSucceed) {
+    strcpy(testResult.errorMessage, result.errorMessage);
+    return testResult;
+  }
+
+  // Beaver is a 2/2 so both pets should now be fainted
+  if (!playerState1.boardSlots[0].pet.battleState.fainted ||
+      !playerState2.boardSlots[0].pet.battleState.fainted) {
+    strcpy(testResult.errorMessage, "Expected both pets to be fainted");
+    return testResult;
+  }
+
+  testResult.didSucceed = true;
+  return testResult;
+}
+
+TestResult testBattlePhase(void)
+{
+  TestResult testResult = {"", false};
+  PetBase beaver = beaverBase();
+
+  GameState gameState1;
+  PlayerState playerState1;
+  setup(&gameState1, &playerState1, 10, 10, 1, PhaseBattle);
+  setPet(&playerState1, beaver, 0);
+  setPet(&playerState1, beaver, 1);
+  setPet(&playerState1, beaver, 2);
+  setPet(&playerState1, beaver, 3);
+  setupBattleState(&playerState1);
+
+  GameState gameState2;
+  PlayerState playerState2;
+  setup(&gameState2, &playerState2, 10, 10, 1, PhaseBattle);
+  setPet(&playerState2, beaver, 0);
+  setPet(&playerState2, beaver, 1);
+  setPet(&playerState2, beaver, 2);
+  setupBattleState(&playerState2);
+
+  BattlePhaseResult result = doBattlePhase(&playerState1, &playerState2);
+  if (result != BattlePhaseResultPlayer1Win) {
+    strcpy(testResult.errorMessage, "Expected player 1 to win battle phase");
+    return testResult;
+  }
+
+  testResult.didSucceed = true;
+  return testResult;
+}
+
+TestResult testAntTrigger(void)
+{
+  TestResult testResult = {"", false};
+
+  GameState gameState1;
+  PlayerState playerState1;
+  setup(&gameState1, &playerState1, 10, 10, 1, PhaseBattle);
+  setPet(&playerState1, antBase(), 0);
+  setPet(&playerState1, mosquitoBase(), 1);
+  setupBattleState(&playerState1);
+
+  GameState gameState2;
+  PlayerState playerState2;
+  setup(&gameState2, &playerState2, 10, 10, 1, PhaseBattle);
+  setPet(&playerState2, otterBase(), 0);
+  setPet(&playerState2, beaverBase(), 1);
+  setupBattleState(&playerState2);
+
+  // Do a round of battle
+  // The ant and otter should both faint
+  // The ant buff should be applied to the mosquito
+  doBattleRound(&playerState1, &playerState2);
+
+  if (playerState1.boardSlots[1].pet.battleState.attack != 4 ||
+    playerState1.boardSlots[1].pet.battleState.health != 3) {
+    strcpy(testResult.errorMessage, "Ant buff was not applied correctly");
+    return testResult;
+  }
+
+  testResult.didSucceed = true;
+  return testResult;
+}
+
+
+TestResult testCricketTrigger(void)
+{
+  TestResult testResult = {"", false};
+
+  GameState gameState1;
+  PlayerState playerState1;
+  setup(&gameState1, &playerState1, 10, 10, 1, PhaseBattle);
+  setPet(&playerState1, cricketBase(), 0);
+  setPet(&playerState1, mosquitoBase(), 1);
+  setupBattleState(&playerState1);
+
+  GameState gameState2;
+  PlayerState playerState2;
+  setup(&gameState2, &playerState2, 10, 10, 1, PhaseBattle);
+  setPet(&playerState2, pigBase(), 0);
+  setPet(&playerState2, beaverBase(), 1);
+  setupBattleState(&playerState2);
+
+  // Do a round of battle
+  // The cricket and the pig should both faint
+  // Then the cricket should spawn a zombie cricket
+  doBattleRound(&playerState1, &playerState2);
+
+  if (strcmp(playerState1.boardSlots[0].pet.base.name, "zombie cricket") != 0 ||
+    playerState1.boardSlots[0].pet.battleState.attack != 1 ||
+    playerState1.boardSlots[0].pet.battleState.health != 1) {
+      strcpy(testResult.errorMessage, "Expected a 1/1 zombie cricket in slot 0");
+      return testResult;
+  }
+
+  testResult.didSucceed = true;
+  return testResult;
+}
+
+TestResult testBeeTrigger(void)
+{
+  TestResult testResult = {"", false};
+
+  GameState gameState1;
+  PlayerState playerState1;
+  setup(&gameState1, &playerState1, 10, 10, 1, PhaseBattle);
+  setPet(&playerState1, mosquitoBase(), 0);
+  playerState1.boardSlots[0].pet.equippedItem = "bee";
+  setupBattleState(&playerState1);
+
+  GameState gameState2;
+  PlayerState playerState2;
+  setup(&gameState2, &playerState2, 10, 10, 1, PhaseBattle);
+  setPet(&playerState2, fishBase(), 0);
+  setupBattleState(&playerState2);
+
+  // Do a round of battle
+  // The cricket and the pig should both faint
+  // Then the cricket should spawn a zombie cricket
+  doBattleRound(&playerState1, &playerState2);
+
+  if (strcmp(playerState1.boardSlots[0].pet.base.name, "bee") != 0 ||
+    playerState1.boardSlots[0].pet.battleState.attack != 1 ||
+    playerState1.boardSlots[0].pet.battleState.health != 1) {
+      strcpy(testResult.errorMessage, "Expected a 1/1 bee in slot 0");
+      return testResult;
   }
 
   testResult.didSucceed = true;

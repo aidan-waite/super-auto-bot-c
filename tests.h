@@ -1,7 +1,7 @@
-#include "models.h"
-
 #ifndef TESTS
 #define TESTS
+
+#include "models.h"
 
 TestResult testSetup(void);
 TestResult testFillShop(void);
@@ -13,5 +13,10 @@ TestResult testSellPet(void);
 TestResult testBuyItem(void);
 TestResult testBuyApple(void);
 TestResult testBuyHoney(void);
+TestResult testSingleBattleRound(void);
+TestResult testBattlePhase(void);
+TestResult testAntTrigger(void);
+TestResult testCricketTrigger(void);
+TestResult testBeeTrigger(void);
 
 #endif // TESTS
