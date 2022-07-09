@@ -5,7 +5,7 @@
 In terminal:
 
 1. make
-2. ./out.o
+2. ./test
 
 ## Roadmap
 
