@@ -12,6 +12,7 @@ PetBase horseBase();
 PetBase mosquitoBase();
 PetBase otterBase();
 PetBase pigBase();
+PetBase beeBase();
 
 ItemBase appleBase();
 ItemBase honeyBase();

@@ -14,7 +14,7 @@ TestResult testBuyItem(void);
 TestResult testBuyApple(void);
 TestResult testBuyHoney(void);
 TestResult testSingleBattleRound(void);
-TestResult testBattlePhase(void);
+TestResult testBattlePhaseSimple1(void);
 TestResult testAntTrigger(void);
 TestResult testCricketTrigger(void);
 TestResult testBeeTrigger(void);

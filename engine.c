@@ -87,15 +87,16 @@ void printGameState(GameState gameState, PlayerState playerState)
   printf("*** / / / ***\n\n");
 }
 
-void setupBattleSlot(PlayerState *playerState, int i) {
+void setupBattleSlot(PlayerState *playerState, int i)
+{
   playerState->boardSlots[i].pet.battleState.attack = playerState->boardSlots[i].pet.attack;
   playerState->boardSlots[i].pet.battleState.health = playerState->boardSlots[i].pet.health;
   playerState->boardSlots[i].pet.battleState.fainted = false;
 }
 
 /**
-* Set a pet slot regardless of usual constraints such as gold. Used for testing.
-*/
+ * Set a pet slot regardless of usual constraints such as gold. Used for testing.
+ */
 void setPet(PlayerState *playerState, PetBase base, int buildSlot)
 {
   playerState->boardSlots[buildSlot].pet.base = base;
@@ -106,11 +107,14 @@ void setPet(PlayerState *playerState, PetBase base, int buildSlot)
 }
 
 /**
-* Summon a pet at or ahead of slotInd if possible.
-*/
-void summon(PlayerState *playerState, PetBase petBase, int slotInd) {
-  for(int i = 0; i <= slotInd; i++) {
-    if (playerState->boardSlots[i].isEmpty) {
+ * Summon a pet at or ahead of slotInd if possible.
+ */
+void summon(PlayerState *playerState, PetBase petBase, int slotInd)
+{
+  for (int i = 0; i <= slotInd; i++)
+  {
+    if (playerState->boardSlots[i].isEmpty)
+    {
       setPet(playerState, petBase, i);
       setupBattleSlot(playerState, i);
       return;
@@ -122,67 +126,76 @@ void summon(PlayerState *playerState, PetBase petBase, int slotInd) {
 
 void handleCricketTrigger(PlayerState *playerState, int slotInd)
 {
-  PetBase base = { "zombie cricket", "🦗", 1, 0, 11111111, 1, 1};
+  PetBase base = {"zombie cricket", "🦗", 1, 0, 11111111, 1, 1};
   summon(playerState, base, slotInd);
 }
 
 void handleAntTrigger(PlayerState *playerState, int slotInd)
 {
-    // Give a random friend +2/+1
-    if (slotInd == 4) {
-      printf("Ant was the last pet so its buff doesn't do anything\n");
-      return;
-    }
-
-    int validBuffIndexes[5];
-    memset(validBuffIndexes, -1, sizeof(int) * 5);
-    int validBuffIndex = 0;
-
-    for (int i = 0; i < 5; i++) {
-      if (i != slotInd &&
-        !playerState->boardSlots[i].isEmpty &&
-        !playerState->boardSlots[i].pet.battleState.fainted) {
-          validBuffIndexes[validBuffIndex++] = i;
-        }
-    }
-
-    if (validBuffIndex == 0) {
-      printf("There are no valid targets for ant buff\n");
-      return;
-    }
-
-    int buffInd = validBuffIndexes[rand() % validBuffIndex];
-    playerState->boardSlots[buffInd].pet.battleState.attack += 2;
-    playerState->boardSlots[buffInd].pet.battleState.health += 1;
+  // Give a random friend +2/+1
+  if (slotInd == 4)
+  {
+    printf("Ant was the last pet so its buff doesn't do anything\n");
     return;
+  }
+
+  int validBuffIndexes[5];
+  memset(validBuffIndexes, -1, sizeof(int) * 5);
+  int validBuffIndex = 0;
+
+  for (int i = 0; i < 5; i++)
+  {
+    if (i != slotInd &&
+        !playerState->boardSlots[i].isEmpty &&
+        !playerState->boardSlots[i].pet.battleState.fainted)
+    {
+      validBuffIndexes[validBuffIndex++] = i;
+    }
+  }
+
+  if (validBuffIndex == 0)
+  {
+    printf("There are no valid targets for ant buff\n");
+    return;
+  }
+
+  int buffInd = validBuffIndexes[rand() % validBuffIndex];
+  playerState->boardSlots[buffInd].pet.battleState.attack += 2;
+  playerState->boardSlots[buffInd].pet.battleState.health += 1;
+  return;
 }
 
 void handleBeeTrigger(PlayerState *playerState, int slotInd)
 {
-  PetBase base = { "bee", "🐝", 1, 0, 11111111, 1, 1};
+  PetBase base = {"bee", "🐝", 1, 0, 11111111, 1, 1};
   summon(playerState, base, slotInd);
 }
 
 void petDidFaint(PlayerState *playerState, int slotInd)
 {
-  if (strcmp(playerState->boardSlots[slotInd].pet.base.name, "ant") == 0) {
+  if (strcmp(playerState->boardSlots[slotInd].pet.base.name, "ant") == 0)
+  {
     handleAntTrigger(playerState, slotInd);
   }
 
-  if (strcmp(playerState->boardSlots[slotInd].pet.base.name, "cricket") == 0) {
+  if (strcmp(playerState->boardSlots[slotInd].pet.base.name, "cricket") == 0)
+  {
     handleCricketTrigger(playerState, slotInd);
   }
 
-  if (playerState->boardSlots[slotInd].pet.equippedItem && strcmp(playerState->boardSlots[slotInd].pet.equippedItem, "bee") == 0) {
+  if (playerState->boardSlots[slotInd].pet.equippedItem && strcmp(playerState->boardSlots[slotInd].pet.equippedItem, "bee") == 0)
+  {
     handleBeeTrigger(playerState, slotInd);
   }
 }
 
 bool haveAllPetsFainted(PlayerState *playerState)
 {
-  for (int i = 0; i < 5; i++) {
+  for (int i = 0; i < 5; i++)
+  {
     if (!playerState->boardSlots[i].isEmpty &&
-        !playerState->boardSlots[i].pet.battleState.fainted) {
+        !playerState->boardSlots[i].pet.battleState.fainted)
+    {
       return false;
     }
   }
@@ -225,10 +238,10 @@ ItemBase randomItemBase(GameState gameState)
 {
   int ind = randomItemBaseIndForTier(gameState, 1);
   ItemBase i = {
-    gameState.baseItems[ind].name,
-    gameState.baseItems[ind].unicodeCodePoint,
-    gameState.baseItems[ind].effect,
-    gameState.baseItems[ind].spawnChanceRound1,
+      gameState.baseItems[ind].name,
+      gameState.baseItems[ind].unicodeCodePoint,
+      gameState.baseItems[ind].effect,
+      gameState.baseItems[ind].spawnChanceRound1,
   };
   return i;
 }
@@ -304,12 +317,14 @@ void fillShop(GameState gameState, PlayerState *playerState)
   }
 }
 
-ItemBase appleBase() {
+ItemBase appleBase()
+{
   ItemBase base = {"apple", "🍎", "perma-buff-1-1", 50000000};
   return base;
 }
 
-ItemBase honeyBase() {
+ItemBase honeyBase()
+{
   ItemBase base = {"honey", "🍯", "equip-bee", 50000000};
   return base;
 }
@@ -321,48 +336,63 @@ void populateBaseItems(ItemBase baseItems[2])
   baseItems[i++] = honeyBase();
 }
 
-PetBase antBase() {
-  PetBase base = { "ant", "🐜", 1, 0, 11111111, 2, 1 };
+PetBase antBase()
+{
+  PetBase base = {"ant", "🐜", 1, 0, 11111111, 2, 1};
   return base;
 }
 
-PetBase beaverBase() {
-  PetBase base = { "beaver", "🦫", 1, 0, 11111111, 2, 2};
+PetBase beaverBase()
+{
+  PetBase base = {"beaver", "🦫", 1, 0, 11111111, 2, 2};
   return base;
 }
 
-PetBase cricketBase() {
-  PetBase base = { "cricket", "🦗", 1, 0, 11111111, 1, 2};
+PetBase cricketBase()
+{
+  PetBase base = {"cricket", "🦗", 1, 0, 11111111, 1, 2};
   return base;
 }
 
-PetBase duckBase() {
-  PetBase base = { "duck", "🦆", 1, 0, 11111111, 1, 3};
+PetBase duckBase()
+{
+  PetBase base = {"duck", "🦆", 1, 0, 11111111, 1, 3};
   return base;
 }
 
-PetBase fishBase() {
-  PetBase base = { "fish", "🐟", 1, 0, 11111111, 2, 3};
+PetBase fishBase()
+{
+  PetBase base = {"fish", "🐟", 1, 0, 11111111, 2, 3};
   return base;
 }
 
-PetBase horseBase() {
-  PetBase base = { "horse", "🐎", 1, 0, 11111111, 2, 1};
+PetBase horseBase()
+{
+  PetBase base = {"horse", "🐎", 1, 0, 11111111, 2, 1};
   return base;
 }
 
-PetBase mosquitoBase() {
-  PetBase base = { "mosquito", "🦟", 1, 0, 11111111, 2, 2};
+PetBase mosquitoBase()
+{
+  PetBase base = {"mosquito", "🦟", 1, 0, 11111111, 2, 2};
   return base;
 }
 
-PetBase otterBase() {
-  PetBase base = { "otter", "🦦", 1, 0, 11111111, 1, 2};
+PetBase otterBase()
+{
+  PetBase base = {"otter", "🦦", 1, 0, 11111111, 1, 2};
   return base;
 }
 
-PetBase pigBase() {
-  PetBase base = { "pig", "🐖", 1, 0, 11111111, 3, 1};
+PetBase pigBase()
+{
+  PetBase base = {"pig", "🐖", 1, 0, 11111111, 3, 1};
+  return base;
+}
+
+PetBase beeBase()
+{
+  PetBase base = {"bee", "🐝", 1, 0, 0, 1, 1};
   return base;
 }
 
@@ -442,27 +472,32 @@ OperationResult buyItem(GameState gameState, PlayerState *playerState, int buySl
 {
   OperationResult result = {"", false};
 
-  if (playerState->gold < 3) {
+  if (playerState->gold < 3)
+  {
     strcpy(result.errorMessage, "Not enough gold to buy item");
     return result;
   }
 
-  if (playerState->itemSlots[buySlot].isEmpty) {
+  if (playerState->itemSlots[buySlot].isEmpty)
+  {
     strcpy(result.errorMessage, "Item slot is empty");
     return result;
   }
 
-  if (playerState->boardSlots[targetSlot].isEmpty) {
+  if (playerState->boardSlots[targetSlot].isEmpty)
+  {
     strcpy(result.errorMessage, "Target build slot is empty");
     return result;
   }
 
-  if (strcmp(playerState->itemSlots[buySlot].item.effect, "perma-buff-1-1") == 0) {
+  if (strcmp(playerState->itemSlots[buySlot].item.effect, "perma-buff-1-1") == 0)
+  {
     playerState->boardSlots[targetSlot].pet.attack += 1;
     playerState->boardSlots[targetSlot].pet.health += 1;
   }
 
-  if (strcmp(playerState->itemSlots[buySlot].item.effect, "equip-bee") == 0) {
+  if (strcmp(playerState->itemSlots[buySlot].item.effect, "equip-bee") == 0)
+  {
     playerState->boardSlots[targetSlot].pet.equippedItem = "bee";
   }
 
@@ -472,8 +507,10 @@ OperationResult buyItem(GameState gameState, PlayerState *playerState, int buySl
 
 void setupBattleState(PlayerState *playerState)
 {
-  for (int i = 0; i < 5; i++) {
-    if (!playerState->boardSlots[i].isEmpty) {
+  for (int i = 0; i < 5; i++)
+  {
+    if (!playerState->boardSlots[i].isEmpty)
+    {
       setupBattleSlot(playerState, i);
     }
   }
@@ -483,39 +520,47 @@ OperationResult doBattleRound(PlayerState *playerState1, PlayerState *playerStat
 {
   OperationResult result = {"", false};
 
+  // Find player 1's pet who will battle
   int ind1 = -1;
-  int ind2 = -1;
-
-  for (int a = 0; a < 5; a++) {
+  for (int a = 0; a < 5; a++)
+  {
     if (!playerState1->boardSlots[a].isEmpty &&
-        !playerState1->boardSlots[a].pet.battleState.fainted) {
+        !playerState1->boardSlots[a].pet.battleState.fainted)
+    {
       ind1 = a;
       break;
     }
   }
 
-  for (int b = 0; b < 5; b++) {
+  // Find player 2's pet who will battle
+  int ind2 = -1;
+  for (int b = 0; b < 5; b++)
+  {
     if (!playerState2->boardSlots[b].isEmpty &&
-      !playerState2->boardSlots[b].pet.battleState.fainted) {
+        !playerState2->boardSlots[b].pet.battleState.fainted)
+    {
       ind2 = b;
       break;
     }
   }
 
-  if (ind1 == -1 || ind2 == -1) {
+  if (ind1 == -1 || ind2 == -1)
+  {
     strcpy(result.errorMessage, "Unable to find a pet that hasn't fainted");
     return result;
   }
 
   playerState1->boardSlots[ind1].pet.battleState.health -= playerState2->boardSlots[ind2].pet.battleState.attack;
-  if (playerState1->boardSlots[ind1].pet.battleState.health <= 0) {
+  if (playerState1->boardSlots[ind1].pet.battleState.health <= 0)
+  {
     playerState1->boardSlots[ind1].pet.battleState.fainted = true;
     playerState1->boardSlots[ind1].isEmpty = true;
     petDidFaint(playerState1, ind1);
   }
 
-  playerState2->boardSlots[ind2].pet.battleState.health -= playerState2->boardSlots[ind1].pet.battleState.attack;
-  if (playerState2->boardSlots[ind2].pet.battleState.health <= 0) {
+  playerState2->boardSlots[ind2].pet.battleState.health -= playerState1->boardSlots[ind1].pet.battleState.attack;
+  if (playerState2->boardSlots[ind2].pet.battleState.health <= 0)
+  {
     playerState2->boardSlots[ind2].pet.battleState.fainted = true;
     playerState2->boardSlots[ind2].isEmpty = true;
     petDidFaint(playerState2, ind2);
@@ -527,21 +572,29 @@ OperationResult doBattleRound(PlayerState *playerState1, PlayerState *playerStat
 
 BattlePhaseResult doBattlePhase(PlayerState *playerState1, PlayerState *playerState2)
 {
-  while (!haveAllPetsFainted(playerState1) && !haveAllPetsFainted(playerState2)) {
+  while (!haveAllPetsFainted(playerState1) && !haveAllPetsFainted(playerState2))
+  {
     OperationResult result = doBattleRound(playerState1, playerState2);
-    if (!result.didSucceed) {
+    if (!result.didSucceed)
+    {
       printf("Something went wrong while doing battle");
     }
   }
 
   bool p1 = haveAllPetsFainted(playerState1);
   bool p2 = haveAllPetsFainted(playerState2);
-  if (p1 && p2) {
+  if (p1 && p2)
+  {
     return BattlePhaseResultTie;
-  } else if (p1) {
+  }
+  else if (p1)
+  {
     return BattlePhaseResultPlayer2Win;
-  } else if (p2) {
-    return BattlePhaseResultPlayer1Win;;
+  }
+  else if (p2)
+  {
+    return BattlePhaseResultPlayer1Win;
+    ;
   }
 
   printf("If we get here something is very wrong!");
@@ -549,8 +602,8 @@ BattlePhaseResult doBattlePhase(PlayerState *playerState1, PlayerState *playerSt
 }
 
 /**
-* Buy a pet using gold
-*/
+ * Buy a pet using gold
+ */
 OperationResult buyPet(GameState gameState, PlayerState *playerState, int buySlot, int buildSlot)
 {
   OperationResult result = {"", false};
@@ -601,5 +654,4 @@ void sellPet(GameState gameState, PlayerState *playerState, int sellSlot)
 
 void executeRoundOfCombat(GameState *g1, PlayerState *p1, GameState *g2, PlayerState *p2)
 {
-
 }

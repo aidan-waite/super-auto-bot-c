@@ -19,7 +19,7 @@ void printTestResult(TestResult result, char *name)
 
 void runAllTests(void)
 {
-  printf("--- START TESTS ---\n\n");
+  printf("\n--- START TESTS ---\n\n");
   printTestResult(testSetup(), "Setup test");
   printTestResult(testFillShop(), "Fill shop");
   printTestResult(testBuyPet(), "Buy pet");
@@ -31,11 +31,11 @@ void runAllTests(void)
   printTestResult(testBuyApple(), "Buy apple");
   printTestResult(testBuyHoney(), "Buy honey");
   printTestResult(testSingleBattleRound(), "Battle round");
-  printTestResult(testBattlePhase(), "Battle phase");
+  printTestResult(testBattlePhaseSimple1(), "Battle phase");
   printTestResult(testAntTrigger(), "Ant trigger");
   printTestResult(testCricketTrigger(), "Cricket trigger");
   printTestResult(testBeeTrigger(), "Bee trigger");
-  printf("\n--- END TESTS ---\n");
+  printf("\n--- END TESTS ---\n\n");
 }
 
 int main()
