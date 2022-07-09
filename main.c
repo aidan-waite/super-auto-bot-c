@@ -7,7 +7,7 @@
 
 void printTestResult(TestResult result, char *name)
 {
-  if (result.didSucceed)
+  if (result.succeeded)
   {
     printf("✅ %s succeeded\n", name);
   }
@@ -32,9 +32,12 @@ void runAllTests(void)
   printTestResult(testBuyHoney(), "Buy honey");
   printTestResult(testSingleBattleRound(), "Battle round");
   printTestResult(testBattlePhaseSimple1(), "Battle phase");
-  printTestResult(testAntTrigger(), "Ant trigger");
-  printTestResult(testCricketTrigger(), "Cricket trigger");
-  printTestResult(testBeeTrigger(), "Bee trigger");
+  printTestResult(testBattleAntTrigger(), "Battle ant trigger");
+  printTestResult(testBattleCricketTrigger(), "Battle cricket trigger");
+  printTestResult(testBattleItemHoney(), "Battle item honey");
+  printTestResult(testBattleSpawnWhenFull(), "Battle spawn when full");
+  printTestResult(testBattleOneLargePetWins(), "Battle one large pet wins");
+  printTestResult(testBattleNoPets(), "Battle no pets");
   printf("\n--- END TESTS ---\n\n");
 }
 

@@ -13,6 +13,7 @@ PetBase mosquitoBase();
 PetBase otterBase();
 PetBase pigBase();
 PetBase beeBase();
+PetBase boxBase(int strength);
 
 ItemBase appleBase();
 ItemBase honeyBase();
@@ -32,8 +33,8 @@ void sellPet(GameState gameState, PlayerState *playerState, int sellSlot);
 OperationResult buyItem(GameState gameState, PlayerState *playerState, int buySlot, int targetSlot);
 void setPet(PlayerState *playerState, PetBase base, int buildSlot);
 void setupBattleState(PlayerState *playerState);
-OperationResult doBattleRound(PlayerState *playerState1, PlayerState *playerState2);
-BattlePhaseResult doBattlePhase(PlayerState *playerState1, PlayerState *playerState2);
+BattleResult doBattleRound(PlayerState *playerState1, PlayerState *playerState2);
+BattleResult doBattlePhase(PlayerState *playerState1, PlayerState *playerState2);
 bool haveAllPetsFainted(PlayerState *playerState);
 void petDidFaint(PlayerState *playerState, int slotIndex);
 void summon(PlayerState *playerState, PetBase petBase, int slotInd);
@@ -41,5 +42,6 @@ void handleCricketTrigger(PlayerState *playerState, int slotInd);
 void handleAntTrigger(PlayerState *playerState, int slotInd);
 void setupBattleSlot(PlayerState *playerState, int i);
 void printPetBase(PetBase base);
+void printPetBuilt(PetBuilt pet);
 
 #endif // ENGINE

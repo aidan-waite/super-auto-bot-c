@@ -6,22 +6,31 @@
 struct TestResult
 {
   char errorMessage[200];
-  bool didSucceed;
+  bool succeeded;
 };
 typedef struct TestResult TestResult;
 
-enum BattlePhaseResult
+enum BattleWinner
 {
-  BattlePhaseResultPlayer1Win,
-  BattlePhaseResultPlayer2Win,
-  BattlePhaseResultTie
+  BattleWinnerPlayer1, // Player 1's pet lived and player 2's bet fainted
+  BattleWinnerPlayer2, // Player 2's pet lived and player 1's bet fainted
+  BattleWinnerTie, // Both pets lived
+  BattleWinnerError // Something went wrong: check the errorMessage for details
 };
-typedef enum BattlePhaseResult BattlePhaseResult;
+typedef enum BattleWinner BattleWinner;
+
+struct BattleResult
+{
+  BattleWinner winner;
+  bool succeeded;
+  char errorMessage[200];
+};
+typedef struct BattleResult BattleResult;
 
 struct OperationResult
 {
   char errorMessage[200];
-  bool didSucceed;
+  bool succeeded;
 };
 typedef struct OperationResult OperationResult;
 

@@ -40,7 +40,7 @@ TestResult testSetup(void)
     }
   }
 
-  result.didSucceed = true;
+  result.succeeded = true;
   return result;
 }
 
@@ -74,7 +74,7 @@ TestResult testFillShop(void)
 
   printGameState(gameState, playerState);
 
-  result.didSucceed = true;
+  result.succeeded = true;
   return result;
 }
 
@@ -89,7 +89,7 @@ TestResult testBuyPet(void)
   fillShop(gameState, &playerState);
   OperationResult buyResult = buyPet(gameState, &playerState, 0, 0);
 
-  if (!buyResult.didSucceed)
+  if (!buyResult.succeeded)
   {
     strcpy(testResult.errorMessage, buyResult.errorMessage);
     return testResult;
@@ -107,7 +107,7 @@ TestResult testBuyPet(void)
     return testResult;
   }
 
-  testResult.didSucceed = true;
+  testResult.succeeded = true;
   return testResult;
 }
 
@@ -123,7 +123,7 @@ TestResult testBuyPetInsufficientGold(void)
   fillShop(gameState, &playerState);
   OperationResult buyResult = buyPet(gameState, &playerState, 0, 0);
 
-  if (buyResult.didSucceed)
+  if (buyResult.succeeded)
   {
     strcpy(testResult.errorMessage, "Buy pet succeeded with insufficient gold");
     return testResult;
@@ -135,7 +135,7 @@ TestResult testBuyPetInsufficientGold(void)
     return testResult;
   }
 
-  testResult.didSucceed = true;
+  testResult.succeeded = true;
   return testResult;
 }
 
@@ -169,7 +169,7 @@ TestResult testClearShopSlots(void)
     }
   }
 
-  testResult.didSucceed = true;
+  testResult.succeeded = true;
   return testResult;
 }
 
@@ -194,7 +194,7 @@ TestResult testClearBoardSlots(void)
     }
   }
 
-  testResult.didSucceed = true;
+  testResult.succeeded = true;
   return testResult;
 }
 
@@ -224,7 +224,7 @@ TestResult testSellPet(void)
     return testResult;
   }
 
-  testResult.didSucceed = true;
+  testResult.succeeded = true;
   return testResult;
 }
 
@@ -242,13 +242,13 @@ TestResult testBuyItem(void)
 
   OperationResult buyResult = buyItem(gameState, &playerState, 0, 2);
 
-  if (!buyResult.didSucceed)
+  if (!buyResult.succeeded)
   {
     strcpy(testResult.errorMessage, buyResult.errorMessage);
     return testResult;
   }
 
-  testResult.didSucceed = true;
+  testResult.succeeded = true;
   return testResult;
 }
 
@@ -270,7 +270,7 @@ TestResult testBuyApple(void)
 
   OperationResult buyResult = buyItem(gameState, &playerState, 0, 2);
 
-  if (!buyResult.didSucceed)
+  if (!buyResult.succeeded)
   {
     strcpy(testResult.errorMessage, buyResult.errorMessage);
     return testResult;
@@ -288,7 +288,7 @@ TestResult testBuyApple(void)
     return testResult;
   }
 
-  testResult.didSucceed = true;
+  testResult.succeeded = true;
   return testResult;
 }
 
@@ -306,19 +306,19 @@ TestResult testBuyHoney(void)
   buyPet(gameState, &playerState, 2, 2);
   OperationResult buyResult = buyItem(gameState, &playerState, 0, 2);
 
-  if (!buyResult.didSucceed)
+  if (!buyResult.succeeded)
   {
     strcpy(testResult.errorMessage, buyResult.errorMessage);
     return testResult;
   }
 
-  if (strcmp(playerState.boardSlots[2].pet.equippedItem, "bee") != 0)
+  if (strcmp(playerState.boardSlots[2].pet.equippedItem, "honey") != 0)
   {
     strcpy(testResult.errorMessage, "Expected status to be bee");
     return testResult;
   }
 
-  testResult.didSucceed = true;
+  testResult.succeeded = true;
   return testResult;
 }
 
@@ -339,8 +339,8 @@ TestResult testSingleBattleRound(void)
   setPet(&playerState2, beaver, 0);
   setupBattleState(&playerState2);
 
-  OperationResult result = doBattleRound(&playerState1, &playerState2);
-  if (!result.didSucceed)
+  BattleResult result = doBattleRound(&playerState1, &playerState2);
+  if (!result.succeeded)
   {
     strcpy(testResult.errorMessage, result.errorMessage);
     return testResult;
@@ -354,7 +354,7 @@ TestResult testSingleBattleRound(void)
     return testResult;
   }
 
-  testResult.didSucceed = true;
+  testResult.succeeded = true;
   return testResult;
 }
 
@@ -374,18 +374,95 @@ TestResult testBattlePhaseSimple1(void)
   setPet(&playerState2, beeBase(), 0);
   setupBattleState(&playerState2);
 
-  BattlePhaseResult result = doBattlePhase(&playerState1, &playerState2);
-  if (result != BattlePhaseResultPlayer1Win)
+  BattleResult result = doBattlePhase(&playerState1, &playerState2);
+  if (result.winner != BattleWinnerPlayer1)
   {
     strcpy(testResult.errorMessage, "Expected player 1 to win battle phase");
     return testResult;
   }
 
-  testResult.didSucceed = true;
+  testResult.succeeded = true;
   return testResult;
 }
 
-TestResult testAntTrigger(void)
+TestResult testBattleOneLargePetWins(void)
+{
+  TestResult testResult = {"", false};
+
+  GameState gameState1;
+  PlayerState playerState1;
+  setup(&gameState1, &playerState1, 10, 10, 1, PhaseBattle);
+  setPet(&playerState1, boxBase(1), 0);
+  setPet(&playerState1, boxBase(1), 1);
+  setPet(&playerState1, boxBase(1), 2);
+  setPet(&playerState1, boxBase(1), 3);
+  setPet(&playerState1, boxBase(1), 4);
+
+  setupBattleState(&playerState1);
+
+  GameState gameState2;
+  PlayerState playerState2;
+  setup(&gameState2, &playerState2, 10, 10, 1, PhaseBattle);
+  setPet(&playerState2, boxBase(50), 0);
+  setupBattleState(&playerState2);
+
+  BattleResult battleResult = doBattlePhase(&playerState1, &playerState2);
+  if (!battleResult.succeeded) {
+    strcpy(testResult.errorMessage, battleResult.errorMessage);
+    return testResult;
+  }
+
+  if (battleResult.winner != BattleWinnerPlayer2) {
+    strcpy(testResult.errorMessage, "Expected player 2 to win");
+    return testResult;
+  }
+
+  testResult.succeeded = true;
+  return testResult;
+}
+
+/**
+* A cricket in front with honey should only spawn 1 pet
+*/
+TestResult testBattleSpawnWhenFull(void)
+{
+  TestResult testResult = {"", false};
+
+  GameState gameState1;
+  PlayerState playerState1;
+  setup(&gameState1, &playerState1, 10, 10, 1, PhaseBattle);
+  setPet(&playerState1, boxBase(1), 0);
+  setPet(&playerState1, boxBase(1), 1);
+  setPet(&playerState1, boxBase(1), 2);
+  setPet(&playerState1, boxBase(1), 3);
+  setPet(&playerState1, cricketBase(), 4);
+  playerState1.boardSlots[4].pet.equippedItem = "honey";
+
+  setupBattleState(&playerState1);
+
+  GameState gameState2;
+  PlayerState playerState2;
+  setup(&gameState2, &playerState2, 10, 10, 1, PhaseBattle);
+  setPet(&playerState2, boxBase(10), 0);
+  setupBattleState(&playerState2);
+
+  BattleResult round1 = doBattleRound(&playerState1, &playerState2);
+
+  if (!round1.succeeded) {
+    strcpy(testResult.errorMessage, round1.errorMessage);
+    return testResult;
+  }
+
+  if (playerState1.boardSlots[4].isEmpty) {
+    strcpy(testResult.errorMessage, "Slot should not be empty, it should have a bee or zombie cricket");
+    return testResult;
+  }
+
+  testResult.succeeded = true;
+  return testResult;
+}
+
+TestResult testBattleAntTrigger(void)
 {
   TestResult testResult = {"", false};
 
@@ -415,11 +492,11 @@ TestResult testAntTrigger(void)
     return testResult;
   }
 
-  testResult.didSucceed = true;
+  testResult.succeeded = true;
   return testResult;
 }
 
-TestResult testCricketTrigger(void)
+TestResult testBattleCricketTrigger(void)
 {
   TestResult testResult = {"", false};
 
@@ -450,31 +527,68 @@ TestResult testCricketTrigger(void)
     return testResult;
   }
 
-  testResult.didSucceed = true;
+  testResult.succeeded = true;
   return testResult;
 }
 
-TestResult testBeeTrigger(void)
+TestResult testBattleNoPets(void)
 {
   TestResult testResult = {"", false};
 
   GameState gameState1;
   PlayerState playerState1;
   setup(&gameState1, &playerState1, 10, 10, 1, PhaseBattle);
-  setPet(&playerState1, mosquitoBase(), 0);
-  playerState1.boardSlots[0].pet.equippedItem = "bee";
   setupBattleState(&playerState1);
 
   GameState gameState2;
   PlayerState playerState2;
   setup(&gameState2, &playerState2, 10, 10, 1, PhaseBattle);
-  setPet(&playerState2, fishBase(), 0);
+  setPet(&playerState2, boxBase(3), 0);
   setupBattleState(&playerState2);
 
-  // Do a round of battle
-  // The cricket and the pig should both faint
-  // Then the cricket should spawn a zombie cricket
-  doBattleRound(&playerState1, &playerState2);
+  BattleResult battle = doBattleRound(&playerState1, &playerState2);
+  if (!battle.succeeded) {
+    strcpy(testResult.errorMessage, battle.errorMessage);
+    return testResult;
+  }
+
+  if (battle.winner != BattleWinnerPlayer2) {
+    strcpy(testResult.errorMessage, "Expectd player 2 to win");
+    return testResult;
+  }
+
+  testResult.succeeded = true;
+  return testResult;
+}
+
+TestResult testBattleItemHoney(void)
+{
+  TestResult testResult = {"", false};
+
+  GameState gameState1;
+  PlayerState playerState1;
+  setup(&gameState1, &playerState1, 10, 10, 1, PhaseBattle);
+  setPet(&playerState1, boxBase(2), 0);
+  playerState1.boardSlots[0].pet.equippedItem = "honey";
+  setupBattleState(&playerState1);
+
+  GameState gameState2;
+  PlayerState playerState2;
+  setup(&gameState2, &playerState2, 10, 10, 1, PhaseBattle);
+  setPet(&playerState2, boxBase(3), 0);
+  setupBattleState(&playerState2);
+
+  // Expected battle sequence:
+  // 1. 3/3 box kills the 2/2 box with honey
+  // 2. 2/2 box spawns a bee
+  // 3. Bee and 3/1 box kill each other
+  // 4. Battle ends in a tie
+  BattleResult round1 = doBattleRound(&playerState1, &playerState2);
+
+  if (!round1.succeeded) {
+    strcpy(testResult.errorMessage, round1.errorMessage);
+    return testResult;
+  }
 
   if (strcmp(playerState1.boardSlots[0].pet.base.name, "bee") != 0 ||
       playerState1.boardSlots[0].pet.battleState.attack != 1 ||
@@ -484,6 +598,26 @@ TestResult testBeeTrigger(void)
     return testResult;
   }
 
-  testResult.didSucceed = true;
+  if (strcmp(playerState2.boardSlots[0].pet.base.name, "box") != 0 ||
+      playerState2.boardSlots[0].pet.battleState.attack != 3 ||
+      playerState2.boardSlots[0].pet.battleState.health != 1)
+  {
+    printPetBuilt(playerState2.boardSlots[0].pet);
+    strcpy(testResult.errorMessage, "Expected a 3/1 box in slot 0");
+    return testResult;
+  }
+
+  BattleResult round2 = doBattleRound(&playerState1, &playerState2);
+  if (!round2.succeeded) {
+    strcpy(testResult.errorMessage, round2.errorMessage);
+    return testResult;
+  }
+
+  if (round2.winner != BattleWinnerTie) {
+    strcpy(testResult.errorMessage, "Expected a tie");
+    return testResult;
+  }
+
+  testResult.succeeded = true;
   return testResult;
 }

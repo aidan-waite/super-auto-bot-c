@@ -8,13 +8,15 @@
 
 void printPetBuilt(PetBuilt pet)
 {
-  printf("%s %s tier:%d debugCount:%d attack:%d health:%d\n",
+  printf("%s %s tier:%d debugCount:%d attack:%d health:%d battle state attack:%d health:%d\n",
          pet.base.unicodeCodePoint,
          pet.base.name,
          pet.base.tier,
          pet.base.debugCount,
          pet.attack,
-         pet.health);
+         pet.health,
+         pet.battleState.attack,
+         pet.battleState.health);
 }
 
 void printPetBase(PetBase base)
@@ -85,6 +87,76 @@ void printGameState(GameState gameState, PlayerState playerState)
   }
 
   printf("*** / / / ***\n\n");
+}
+
+
+PetBase antBase()
+{
+  PetBase base = {"ant", "🐜", 1, 0, 11111111, 2, 1};
+  return base;
+}
+
+PetBase beaverBase()
+{
+  PetBase base = {"beaver", "🦫", 1, 0, 11111111, 2, 2};
+  return base;
+}
+
+PetBase cricketBase()
+{
+  PetBase base = {"cricket", "🦗", 1, 0, 11111111, 1, 2};
+  return base;
+}
+
+PetBase duckBase()
+{
+  PetBase base = {"duck", "🦆", 1, 0, 11111111, 1, 3};
+  return base;
+}
+
+PetBase fishBase()
+{
+  PetBase base = {"fish", "🐟", 1, 0, 11111111, 2, 3};
+  return base;
+}
+
+PetBase horseBase()
+{
+  PetBase base = {"horse", "🐎", 1, 0, 11111111, 2, 1};
+  return base;
+}
+
+PetBase mosquitoBase()
+{
+  PetBase base = {"mosquito", "🦟", 1, 0, 11111111, 2, 2};
+  return base;
+}
+
+PetBase otterBase()
+{
+  PetBase base = {"otter", "🦦", 1, 0, 11111111, 1, 2};
+  return base;
+}
+
+PetBase pigBase()
+{
+  PetBase base = {"pig", "🐖", 1, 0, 11111111, 3, 1};
+  return base;
+}
+
+PetBase beeBase()
+{
+  PetBase base = {"bee", "🐝", 1, 0, 0, 1, 1};
+  return base;
+}
+
+/**
+* Box is a simple x/x animal for testing with no triggers
+*/
+PetBase boxBase(int strength)
+{
+  PetBase base = {"box", "[]", 1, 0, 0, strength, strength};
+  return base;
 }
 
 void setupBattleSlot(PlayerState *playerState, int i)
@@ -167,8 +239,7 @@ void handleAntTrigger(PlayerState *playerState, int slotInd)
 
 void handleBeeTrigger(PlayerState *playerState, int slotInd)
 {
-  PetBase base = {"bee", "🐝", 1, 0, 11111111, 1, 1};
-  summon(playerState, base, slotInd);
+  summon(playerState, beeBase(), slotInd);
 }
 
 void petDidFaint(PlayerState *playerState, int slotInd)
@@ -183,7 +254,7 @@ void petDidFaint(PlayerState *playerState, int slotInd)
     handleCricketTrigger(playerState, slotInd);
   }
 
-  if (playerState->boardSlots[slotInd].pet.equippedItem && strcmp(playerState->boardSlots[slotInd].pet.equippedItem, "bee") == 0)
+  if (playerState->boardSlots[slotInd].pet.equippedItem && strcmp(playerState->boardSlots[slotInd].pet.equippedItem, "honey") == 0)
   {
     handleBeeTrigger(playerState, slotInd);
   }
@@ -325,7 +396,7 @@ ItemBase appleBase()
 
 ItemBase honeyBase()
 {
-  ItemBase base = {"honey", "🍯", "equip-bee", 50000000};
+  ItemBase base = {"honey", "🍯", "spawn-bee", 50000000};
   return base;
 }
 
@@ -334,66 +405,6 @@ void populateBaseItems(ItemBase baseItems[2])
   int i = 0;
   baseItems[i++] = appleBase();
   baseItems[i++] = honeyBase();
-}
-
-PetBase antBase()
-{
-  PetBase base = {"ant", "🐜", 1, 0, 11111111, 2, 1};
-  return base;
-}
-
-PetBase beaverBase()
-{
-  PetBase base = {"beaver", "🦫", 1, 0, 11111111, 2, 2};
-  return base;
-}
-
-PetBase cricketBase()
-{
-  PetBase base = {"cricket", "🦗", 1, 0, 11111111, 1, 2};
-  return base;
-}
-
-PetBase duckBase()
-{
-  PetBase base = {"duck", "🦆", 1, 0, 11111111, 1, 3};
-  return base;
-}
-
-PetBase fishBase()
-{
-  PetBase base = {"fish", "🐟", 1, 0, 11111111, 2, 3};
-  return base;
-}
-
-PetBase horseBase()
-{
-  PetBase base = {"horse", "🐎", 1, 0, 11111111, 2, 1};
-  return base;
-}
-
-PetBase mosquitoBase()
-{
-  PetBase base = {"mosquito", "🦟", 1, 0, 11111111, 2, 2};
-  return base;
-}
-
-PetBase otterBase()
-{
-  PetBase base = {"otter", "🦦", 1, 0, 11111111, 1, 2};
-  return base;
-}
-
-PetBase pigBase()
-{
-  PetBase base = {"pig", "🐖", 1, 0, 11111111, 3, 1};
-  return base;
-}
-
-PetBase beeBase()
-{
-  PetBase base = {"bee", "🐝", 1, 0, 0, 1, 1};
-  return base;
 }
 
 void populateBasePets(PetBase basePets[9])
@@ -496,12 +507,12 @@ OperationResult buyItem(GameState gameState, PlayerState *playerState, int buySl
     playerState->boardSlots[targetSlot].pet.health += 1;
   }
 
-  if (strcmp(playerState->itemSlots[buySlot].item.effect, "equip-bee") == 0)
+  if (strcmp(playerState->itemSlots[buySlot].item.effect, "spawn-bee") == 0)
   {
-    playerState->boardSlots[targetSlot].pet.equippedItem = "bee";
+    playerState->boardSlots[targetSlot].pet.equippedItem = "honey";
   }
 
-  result.didSucceed = true;
+  result.succeeded = true;
   return result;
 }
 
@@ -516,9 +527,9 @@ void setupBattleState(PlayerState *playerState)
   }
 }
 
-OperationResult doBattleRound(PlayerState *playerState1, PlayerState *playerState2)
+BattleResult doBattleRound(PlayerState *playerState1, PlayerState *playerState2)
 {
-  OperationResult result = {"", false};
+  BattleResult result = {BattleWinnerError, false, "Initial value"};
 
   // Find player 1's pet who will battle
   int ind1 = -1;
@@ -544,40 +555,68 @@ OperationResult doBattleRound(PlayerState *playerState1, PlayerState *playerStat
     }
   }
 
-  if (ind1 == -1 || ind2 == -1)
-  {
-    strcpy(result.errorMessage, "Unable to find a pet that hasn't fainted");
+  // Players can start a battle with no pets
+  if (ind1 == -1 && ind2 == -1) {
+    result.winner = BattleWinnerTie;
+    result.succeeded = true;
+    return result;
+  } else if (ind1 == -1) {
+    result.winner = BattleWinnerPlayer2;
+    result.succeeded = true;
+    return result;
+  } else if (ind2 == -1) {
+    result.winner = BattleWinnerPlayer1;
+    result.succeeded = true;
     return result;
   }
 
+  bool p1fainted = false;
+  bool p2fainted = false;
+
+  // First deal the damage
   playerState1->boardSlots[ind1].pet.battleState.health -= playerState2->boardSlots[ind2].pet.battleState.attack;
+  playerState2->boardSlots[ind2].pet.battleState.health -= playerState1->boardSlots[ind1].pet.battleState.attack;
+
+  // Then handle the results
   if (playerState1->boardSlots[ind1].pet.battleState.health <= 0)
   {
     playerState1->boardSlots[ind1].pet.battleState.fainted = true;
     playerState1->boardSlots[ind1].isEmpty = true;
     petDidFaint(playerState1, ind1);
+    p1fainted = true;
   }
-
-  playerState2->boardSlots[ind2].pet.battleState.health -= playerState1->boardSlots[ind1].pet.battleState.attack;
   if (playerState2->boardSlots[ind2].pet.battleState.health <= 0)
   {
     playerState2->boardSlots[ind2].pet.battleState.fainted = true;
     playerState2->boardSlots[ind2].isEmpty = true;
     petDidFaint(playerState2, ind2);
+    p2fainted = true;
   }
 
-  result.didSucceed = true;
+  if (p1fainted && p2fainted) {
+    result.winner = BattleWinnerTie;
+  } else if (p1fainted) {
+    result.winner = BattleWinnerPlayer2;
+  } else if (p2fainted) {
+    result.winner = BattleWinnerPlayer1;
+  }
+
+  result.succeeded = true;
   return result;
 }
 
-BattlePhaseResult doBattlePhase(PlayerState *playerState1, PlayerState *playerState2)
+BattleResult doBattlePhase(PlayerState *playerState1, PlayerState *playerState2)
 {
+  BattleResult phaseResult = {BattleWinnerError, false, ""};
+
   while (!haveAllPetsFainted(playerState1) && !haveAllPetsFainted(playerState2))
   {
-    OperationResult result = doBattleRound(playerState1, playerState2);
-    if (!result.didSucceed)
+    BattleResult roundResult = doBattleRound(playerState1, playerState2);
+    if (!roundResult.succeeded)
     {
-      printf("Something went wrong while doing battle");
+      printf("Something went wrong while doing battle phase");
+      strcpy(phaseResult.errorMessage, roundResult.errorMessage);
+      return phaseResult;
     }
   }
 
@@ -585,20 +624,19 @@ BattlePhaseResult doBattlePhase(PlayerState *playerState1, PlayerState *playerSt
   bool p2 = haveAllPetsFainted(playerState2);
   if (p1 && p2)
   {
-    return BattlePhaseResultTie;
+    phaseResult.winner = BattleWinnerTie;
   }
   else if (p1)
   {
-    return BattlePhaseResultPlayer2Win;
+    phaseResult.winner = BattleWinnerPlayer2;
   }
   else if (p2)
   {
-    return BattlePhaseResultPlayer1Win;
-    ;
+    phaseResult.winner = BattleWinnerPlayer1;
   }
 
-  printf("If we get here something is very wrong!");
-  return BattlePhaseResultTie;
+  phaseResult.succeeded = true;
+  return phaseResult;
 }
 
 /**
@@ -634,7 +672,7 @@ OperationResult buyPet(GameState gameState, PlayerState *playerState, int buySlo
 
   playerState->shopSlots[buySlot].isEmpty = true;
   playerState->gold -= 3;
-  result.didSucceed = true;
+  result.succeeded = true;
   return result;
 }
 

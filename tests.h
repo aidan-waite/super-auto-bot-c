@@ -15,8 +15,11 @@ TestResult testBuyApple(void);
 TestResult testBuyHoney(void);
 TestResult testSingleBattleRound(void);
 TestResult testBattlePhaseSimple1(void);
-TestResult testAntTrigger(void);
-TestResult testCricketTrigger(void);
-TestResult testBeeTrigger(void);
+TestResult testBattleAntTrigger(void);
+TestResult testBattleCricketTrigger(void);
+TestResult testBattleItemHoney(void);
+TestResult testBattleSpawnWhenFull(void);
+TestResult testBattleOneLargePetWins(void);
+TestResult testBattleNoPets(void);
 
 #endif // TESTS
