@@ -3,8 +3,10 @@
 #include <stdlib.h>
 #include <time.h>
 #include <math.h>
-#include "models.h"
 #include <string.h>
+
+#include "models.h"
+#include "bases.h"
 
 void printPetBuilt(PetBuilt pet)
 {
@@ -87,67 +89,6 @@ void printGameState(GameState gameState, PlayerState playerState)
   }
 
   printf("*** / / / ***\n\n");
-}
-
-
-PetBase antBase()
-{
-  PetBase base = {"ant", "🐜", 1, 0, 11111111, 2, 1};
-  return base;
-}
-
-PetBase beaverBase()
-{
-  PetBase base = {"beaver", "🦫", 1, 0, 11111111, 2, 2};
-  return base;
-}
-
-PetBase cricketBase()
-{
-  PetBase base = {"cricket", "🦗", 1, 0, 11111111, 1, 2};
-  return base;
-}
-
-PetBase duckBase()
-{
-  PetBase base = {"duck", "🦆", 1, 0, 11111111, 1, 3};
-  return base;
-}
-
-PetBase fishBase()
-{
-  PetBase base = {"fish", "🐟", 1, 0, 11111111, 2, 3};
-  return base;
-}
-
-PetBase horseBase()
-{
-  PetBase base = {"horse", "🐎", 1, 0, 11111111, 2, 1};
-  return base;
-}
-
-PetBase mosquitoBase()
-{
-  PetBase base = {"mosquito", "🦟", 1, 0, 11111111, 2, 2};
-  return base;
-}
-
-PetBase otterBase()
-{
-  PetBase base = {"otter", "🦦", 1, 0, 11111111, 1, 2};
-  return base;
-}
-
-PetBase pigBase()
-{
-  PetBase base = {"pig", "🐖", 1, 0, 11111111, 3, 1};
-  return base;
-}
-
-PetBase beeBase()
-{
-  PetBase base = {"bee", "🐝", 1, 0, 0, 1, 1};
-  return base;
 }
 
 /**
@@ -276,33 +217,24 @@ bool haveAllPetsFainted(PlayerState *playerState)
 
 int randomItemBaseIndForTier(GameState gameState, int tier)
 {
-  // TODO: switch on tier
+  // There's an equal chance to get each item
+  // so return a random item from the group of
+  // all items <= current tier
+  ItemBase baseItems[16];
 
-  // 1. Sum all probabilities
-  int sum = 0;
-  int x = 0;
+    // Not sure if this is how you memset correctly
+  memset(baseItems, 0, sizeof(PetBase * 16));
 
-  for (x = 0; x < 2; x++)
-  {
-    sum += gameState.baseItems[x].spawnChanceRound1;
-  }
-
-  // 2. Random between 0 and sum
-  int r = rand() % sum;
-  int tmp = 0;
-
-  // 3. Walk through each item, adding chance until you're at > randomnum
-  for (x = 0; x < 2; x++)
-  {
-    tmp += gameState.baseItems[x].spawnChanceRound1;
-    if (tmp > r)
-    {
-      return x;
+  int totalNumberOfItems = 16;
+  int eligibleCount = 0;
+  for (int x = 0; x < totalNumberOfItems; x++) {
+    if (gameState.baseItems[x].tier <= tier) {
+      baseItems[eligibleCount++] = gameState.baseItems[x];
     }
   }
 
-  // default to last index
-  return 1;
+  int randomInd = rand() % eligibleCount;
+  return baseItems[randomInd];
 }
 
 ItemBase randomItemBase(GameState gameState)
@@ -311,41 +243,30 @@ ItemBase randomItemBase(GameState gameState)
   ItemBase i = {
       gameState.baseItems[ind].name,
       gameState.baseItems[ind].unicodeCodePoint,
-      gameState.baseItems[ind].effect,
-      gameState.baseItems[ind].spawnChanceRound1,
   };
   return i;
 }
 
 int randomPetBaseIndForTier(GameState gameState, int tier)
 {
-  // TODO: switch on tier
+  // There's an equal chance to get each pet
+  // so return a random pet from the group of
+  // all pets <= current tier
+  PetBase basePets[58];
 
-  // 1. Sum all probabilities
-  int sum = 0;
-  int x = 0;
+  // Not sure if this is how you memset correctly
+  memset(basePets, 0, sizeof(PetBase * 58));
 
-  for (x = 0; x < 9; x++)
-  {
-    sum += gameState.basePets[x].spawnChanceRound1;
-  }
-
-  // 2. Random between 0 and sum
-  int r = rand() % sum;
-  int tmp = 0;
-
-  // 3. Walk through each item, adding chance until you're at > randomnum
-  for (x = 0; x < 9; x++)
-  {
-    tmp += gameState.basePets[x].spawnChanceRound1;
-    if (tmp > r)
-    {
-      return x;
+  int totalNumberOfPets = 58;
+  int eligibleCount = 0;
+  for (int x = 0; x < totalNumberOfPets; x++) {
+    if (gameState.basePets[x].tier <= tier) {
+      basePets[eligibleCount++] = gameState.basePets[x];
     }
   }
 
-  // default to last index
-  return 8;
+  int randomInd = rand() % eligibleCount;
+  return basePets[randomInd];
 }
 
 PetBase randomPetBase(GameState gameState)
@@ -356,7 +277,6 @@ PetBase randomPetBase(GameState gameState)
       gameState.basePets[ind].unicodeCodePoint,
       gameState.basePets[ind].tier,
       gameState.basePets[ind].debugCount,
-      gameState.basePets[ind].spawnChanceRound1,
       gameState.basePets[ind].attack,
       gameState.basePets[ind].health};
   return b;
@@ -386,18 +306,6 @@ void fillShop(GameState gameState, PlayerState *playerState)
     ShopItemSlot slot = {s, item, false};
     playerState->itemSlots[s] = slot;
   }
-}
-
-ItemBase appleBase()
-{
-  ItemBase base = {"apple", "🍎", "perma-buff-1-1", 50000000};
-  return base;
-}
-
-ItemBase honeyBase()
-{
-  ItemBase base = {"honey", "🍯", "spawn-bee", 50000000};
-  return base;
 }
 
 void populateBaseItems(ItemBase baseItems[2])
@@ -501,13 +409,13 @@ OperationResult buyItem(GameState gameState, PlayerState *playerState, int buySl
     return result;
   }
 
-  if (strcmp(playerState->itemSlots[buySlot].item.effect, "perma-buff-1-1") == 0)
+  if (strcmp(playerState->itemSlots[buySlot].item.name, "apple") == 0)
   {
     playerState->boardSlots[targetSlot].pet.attack += 1;
     playerState->boardSlots[targetSlot].pet.health += 1;
   }
 
-  if (strcmp(playerState->itemSlots[buySlot].item.effect, "spawn-bee") == 0)
+  if (strcmp(playerState->itemSlots[buySlot].item.name, "honey") == 0)
   {
     playerState->boardSlots[targetSlot].pet.equippedItem = "honey";
   }

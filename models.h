@@ -38,8 +38,6 @@ struct ItemBase
 {
   char *name;
   char *unicodeCodePoint;
-  char *effect;
-  int spawnChanceRound1;
 };
 typedef struct ItemBase ItemBase;
 
@@ -49,7 +47,6 @@ struct PetBase
   char *unicodeCodePoint;
   int tier;
   int debugCount;
-  int spawnChanceRound1;
   int attack;
   int health;
 };
